@@ -1,0 +1,7 @@
+﻿services:
+  leximon.api:
+    image: leximon.api
+    build:
+      context: .
+      dockerfile: LexiMon.API/Dockerfile
+
