@@ -716,5 +716,5 @@ FodyWeavers.xsd
 # End of https://www.toptal.com/developers/gitignore/api/aspnetcore,dotnetcore,rider,visualstudio,visualstudiocode,jetbrains,dotenv
 
 # Appsettings files
-appsettings*.json
-appsettings*.Development.json
+**/appsettings*.json
+**/appsettings*.Development.json
