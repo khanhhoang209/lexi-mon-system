@@ -714,3 +714,7 @@ FodyWeavers.xsd
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/aspnetcore,dotnetcore,rider,visualstudio,visualstudiocode,jetbrains,dotenv
+
+# Appsettings files
+appsettings*.json
+appsettings*.Development.json
