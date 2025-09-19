@@ -12,6 +12,7 @@ public class Order : BaseAuditableEntity<Guid>
     public Decimal CoinCost { get; set; }
     public DateTime PaidAt { get; set; }
     public PaymentStatus PaymentStatus { get; set; }
-    public ApplicationUser? User { get; set; } = null!;
+    public ApplicationUser User { get; set; } = null!;
     public Item? Item { get; set; } = null!;
+    public Course? Course { get; set; } = null!;
 }
