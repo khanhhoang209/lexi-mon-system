@@ -1,0 +1,8 @@
+﻿using LexiMon.Repository.Common;
+
+namespace LexiMon.Repository.Domains;
+
+public class AnimationType : BaseAuditableEntity<Guid>
+{
+    public string? Name { get; set; }
+}
