@@ -8,4 +8,6 @@ public class UserDeck : BaseAuditableEntity<Guid>
     public Guid? CourseId { get; set; } = null!;
     public Guid? CustomLessonId { get; set; } = null!;
     public ApplicationUser User { get; set; } = null!;
+    public Course? Course { get; set; } = null!;
+    public ICollection<CustomLesson> CustomLessons { get; set; } = new List<CustomLesson>();
 }
