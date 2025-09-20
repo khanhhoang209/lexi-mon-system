@@ -1,0 +1,16 @@
+﻿using LexiMon.Repository.Common;
+
+namespace LexiMon.Repository.Domains;
+
+public class Character : BaseAuditableEntity<Guid>
+{
+    public Guid UserId { get; set; }
+    public string Name { get; set; } = null!;
+    public int Level { get; set; }
+    public string? HelmetUrl { get; set; } = null!;
+    public string? ArmorUrl { get; set; } = null!;
+    public string? WeaponUrl { get; set; } = null!;
+    public string? BootUrl { get; set; } = null!;
+    public ApplicationUser? User { get; set; } = null;
+    public ICollection<Equipment> Equipments { get; set; } = new List<Equipment>();
+}
