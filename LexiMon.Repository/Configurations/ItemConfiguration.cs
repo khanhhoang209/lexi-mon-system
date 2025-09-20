@@ -16,6 +16,12 @@ public class ItemConfiguration : IEntityTypeConfiguration<Item>
             .HasMaxLength(200)
             .IsRequired();
 
+        builder.Property(x => x.Price)
+            .HasPrecision(18, 2);
+
+        builder.Property(x => x.Coin)
+            .HasPrecision(18, 2);
+
         builder.HasOne(x => x.Category)
             .WithMany(c => c.Items)
             .HasForeignKey(x => x.CategoryId)

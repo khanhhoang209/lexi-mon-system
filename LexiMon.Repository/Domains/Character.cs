@@ -4,7 +4,7 @@ namespace LexiMon.Repository.Domains;
 
 public class Character : BaseAuditableEntity<Guid>
 {
-    public Guid UserId { get; set; }
+    public string UserId { get; set; } = null!;
     public string Name { get; set; } = null!;
     public int Level { get; set; }
     public string? HelmetUrl { get; set; } = null!;

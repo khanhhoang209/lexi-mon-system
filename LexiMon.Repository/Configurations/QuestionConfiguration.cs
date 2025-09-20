@@ -18,16 +18,16 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
             .IsRequired(false);
         builder.Property(q => q.CustomLessonId)
             .IsRequired(false);
-        
+
         builder.HasOne(q => q.Lesson)
             .WithMany(l => l.Questions)
             .HasForeignKey(q => q.LessonId)
             .IsRequired(false)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
         builder.HasOne(q => q.CustomLesson)
             .WithMany(c => c.Questions)
             .HasForeignKey(q => q.CustomLessonId)
             .IsRequired(false)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
