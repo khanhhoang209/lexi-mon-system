@@ -8,9 +8,9 @@ public class CharacterConfiguration : IEntityTypeConfiguration<Character>
 {
     public void Configure(EntityTypeBuilder<Character> builder)
     {
-        builder.ToTable("Character");
-
         builder.HasKey(x => x.Id);
+
+        builder.ToTable("Character");
 
         builder.Property(x => x.Name)
             .IsRequired()

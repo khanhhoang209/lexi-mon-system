@@ -10,15 +10,18 @@ public class UserDeckConfiguration : IEntityTypeConfiguration<UserDeck>
     {
         builder.HasKey(x => x.Id);
 
+        builder.ToTable("UserDeck");
+
         builder.HasOne(x => x.User)
             .WithMany(x => x.UserDecks)
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // builder.HasOne(x => x.Course)
-        //     .WithMany(x => x.UserDecks)
-        //     .HasForeignKey(x => x.CourseId)
-        //     .OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(x => x.Course)
+            .WithMany(x => x.UserDecks)
+            .HasForeignKey(x => x.CourseId)
+            .OnDelete(DeleteBehavior.Cascade);
 
+        builder.ConfigureAuditableProperties();
     }
 }

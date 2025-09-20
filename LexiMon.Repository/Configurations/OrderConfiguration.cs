@@ -34,10 +34,10 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasForeignKey<Order>(x => x.ItemId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // builder.HasOne(x => x.Course)
-        //     .WithOne(x => x.Order)
-        //     .HasForeignKey<Order>(x => x.CourseId)
-        //     .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(x => x.Course)
+            .WithOne(x => x.Order)
+            .HasForeignKey<Order>(x => x.CourseId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.ConfigureAuditableProperties();
     }

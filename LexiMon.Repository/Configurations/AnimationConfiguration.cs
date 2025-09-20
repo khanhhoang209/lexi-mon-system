@@ -10,6 +10,8 @@ public class AnimationConfiguration : IEntityTypeConfiguration<Animation>
     {
         builder.HasKey(x => x.Id);
 
+        builder.ToTable("Animation");
+
         builder.Property(x => x.Name).IsRequired().HasMaxLength(200);
 
         builder.HasOne(x => x.Item)
