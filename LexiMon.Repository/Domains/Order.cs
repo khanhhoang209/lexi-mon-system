@@ -10,7 +10,7 @@ public class Order : BaseAuditableEntity<Guid>
     public Guid? ItemId { get; set; }
     public Decimal PurchaseCost { get; set; }
     public Decimal CoinCost { get; set; }
-    public DateTime PaidAt { get; set; }
+    public DateTimeOffset PaidAt { get; set; }
     public PaymentStatus PaymentStatus { get; set; }
     public ApplicationUser User { get; set; } = null!;
     public Item? Item { get; set; } = null!;
