@@ -2,7 +2,7 @@
 
 namespace LexiMon.Repository.Domains;
 
-public class Equipment : BaseAuditableEntity<Guid>
+public class Equipment : BaseAuditableEntity<(Guid CharacterId, Guid ItemId)>
 {
     public Guid CharacterId { get; set; }
     public Guid ItemId { get; set; }

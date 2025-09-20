@@ -5,5 +5,5 @@ namespace LexiMon.Repository.Domains;
 public class Category : BaseAuditableEntity<Guid>
 {
     public string? Name { get; set; }
-    public Item? Item { get; set; } = null;
+    public ICollection<Item> Items { get; set; } = new List<Item>();
 }
