@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LexiMon.Repository.Migrations
 {
     [DbContext(typeof(LexiMonDbContext))]
-    [Migration("20250924114120_Initial")]
+    [Migration("20250924131913_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -314,7 +314,7 @@ namespace LexiMon.Repository.Migrations
                             AccessFailedCount = 0,
                             BirthDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Coins = 0m,
-                            ConcurrencyStamp = "406119b3-ec08-458d-8648-a2ec806cd836",
+                            ConcurrencyStamp = "f1cba184-9935-4e7c-a7f1-d629c66a4fd7",
                             CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             DeletedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "free@example.com",
@@ -323,10 +323,10 @@ namespace LexiMon.Repository.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "FREE@EXAMPLE.COM",
                             NormalizedUserName = "FREE@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIjKc2QzwViqpRabouGPtxxqQpvORo+DcOUcJ6VeQ+R140hCeY9L5uHm5x9/KQF8kQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEC08huABBYefB1zHX7q/gNlIaKA5xVq99vqLsTKfUMY7amVEJHIrO0OnrvlS3k1V4Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "45845227-b861-44db-9f9e-4e9ec79be4fb",
-                            Status = false,
+                            SecurityStamp = "533e3499-c671-4f1d-8a51-ea977260d7c2",
+                            Status = true,
                             TwoFactorEnabled = false,
                             UpdatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             UserName = "free@example.com"
@@ -337,7 +337,7 @@ namespace LexiMon.Repository.Migrations
                             AccessFailedCount = 0,
                             BirthDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Coins = 0m,
-                            ConcurrencyStamp = "7858086b-c4e3-401e-946e-caa427cd2244",
+                            ConcurrencyStamp = "eca09546-b804-40ba-a9dc-5ea1223d82c5",
                             CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             DeletedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "premium@example.com",
@@ -346,10 +346,10 @@ namespace LexiMon.Repository.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "PREMIUM@EXAMPLE.COM",
                             NormalizedUserName = "PREMIUM@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJyVf39Ub7saxVkn63riTt5b9gt7Rpl+zJtqIPlv5fX2DEiFgUAMnwrP9+Sm+Evpiw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOJvNMKCrnPwgvlM6giRdgKRtE0C2/L2RwNccxo7dbrclok6fjl9wrQMg8HQOT3Jdw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f12698da-529b-490d-a20c-b3741030a495",
-                            Status = false,
+                            SecurityStamp = "21182e0e-c688-4300-99a1-dc385cb9b51d",
+                            Status = true,
                             TwoFactorEnabled = false,
                             UpdatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             UserName = "premium@example.com"
@@ -360,7 +360,7 @@ namespace LexiMon.Repository.Migrations
                             AccessFailedCount = 0,
                             BirthDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Coins = 0m,
-                            ConcurrencyStamp = "54edea63-a438-4475-a5c3-1bb0d1113d48",
+                            ConcurrencyStamp = "44b3cd9b-5861-4c0e-bafe-fc0db0443a2d",
                             CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             DeletedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "admin@example.com",
@@ -369,10 +369,10 @@ namespace LexiMon.Repository.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAECqSh1tnkJcAUO4B8QreeZm5JV+2OZ0mMiNLZsVIfEmYyg+dQKGtQTp3QHwQaejFUA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGZoQnqG79h3lLbUOQpWcnnO5qSUANkKNwx501QmW5StmMlZwyH8xAuUdXHrXajVTg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "173691d3-3b66-48d9-9033-915bbd40be95",
-                            Status = false,
+                            SecurityStamp = "15afaf08-dd45-416d-82f4-d6068dc3cedd",
+                            Status = true,
                             TwoFactorEnabled = false,
                             UpdatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             UserName = "admin@example.com"

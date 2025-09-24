@@ -89,7 +89,8 @@ public class LexiMonDbContext : IdentityDbContext<ApplicationUser>, ILexiMonDbCo
                 NormalizedEmail = "FREE@EXAMPLE.COM",
                 EmailConfirmed = true,
                 PasswordHash = hasher.HashPassword(null!, "12345aA@"),
-                SecurityStamp = Guid.NewGuid().ToString()
+                SecurityStamp = Guid.NewGuid().ToString(),
+                Status = true
             },
             new ApplicationUser
             {
@@ -100,7 +101,8 @@ public class LexiMonDbContext : IdentityDbContext<ApplicationUser>, ILexiMonDbCo
                 NormalizedEmail = "PREMIUM@EXAMPLE.COM",
                 EmailConfirmed = true,
                 PasswordHash = hasher.HashPassword(null!, "12345aA@"),
-                SecurityStamp = Guid.NewGuid().ToString()
+                SecurityStamp = Guid.NewGuid().ToString(),
+                Status = true
             },
             new ApplicationUser
             {
@@ -111,7 +113,8 @@ public class LexiMonDbContext : IdentityDbContext<ApplicationUser>, ILexiMonDbCo
                 NormalizedEmail = "ADMIN@EXAMPLE.COM",
                 EmailConfirmed = true,
                 PasswordHash = hasher.HashPassword(null!, "12345aA@"),
-                SecurityStamp = Guid.NewGuid().ToString()
+                SecurityStamp = Guid.NewGuid().ToString(),
+                Status = true
             }
         };
     }
