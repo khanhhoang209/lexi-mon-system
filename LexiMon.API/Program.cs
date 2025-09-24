@@ -1,11 +1,17 @@
+using System.Text;
 using LexiMon.Repository.Context;
+using LexiMon.Repository.Domains;
 using LexiMon.Repository.Implements;
 using LexiMon.Repository.Interceptors;
 using LexiMon.Repository.Interfaces;
 using LexiMon.Service.Implements;
 using LexiMon.Service.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace LexiMon.API;
 
@@ -24,20 +30,94 @@ public class Program
         builder.Services.AddScoped<ILexiMonDbContext>(provider => provider.GetRequiredService<LexiMonDbContext>());
         builder.Services.AddSingleton(TimeProvider.System);
 
+        // Register services
+        builder.Services.AddScoped<IProductService, ProductService>();
+        builder.Services.AddScoped<IUserService, UserService>();
+
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-        // Register services
-        builder.Services.AddScoped<IProductService, ProductService>();
-
+        builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 
         // Add services to the container.
         builder.Services.AddControllers();
         builder.Services.AddAuthorization();
 
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+
+        //Add Identity
+        builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+        {
+            options.Password.RequireDigit = true;
+            options.Password.RequiredLength = 8;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequiredUniqueChars = 1;
+        })
+        .AddDefaultTokenProviders()
+        .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>("Default")
+        .AddEntityFrameworkStores<LexiMonDbContext>();
+
+        builder.Services.AddHttpContextAccessor();
+
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "LexiMon API",
+                Version = "v1",
+                Description = "API for LexiMon application"
+            });
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Please enter a valid token",
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "Bearer"
+            });
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type=ReferenceType.SecurityScheme,
+                            Id="Bearer"
+                        }
+                    },
+                    []!
+                }
+            });
+        });
+
+        builder.Services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromMinutes(5));
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            var config = builder.Configuration;
+            options.TokenValidationParameters = new TokenValidationParameters()
+            {
+                ClockSkew = TimeSpan.Zero,
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                RequireAudience = true,
+                RequireExpirationTime = true,
+                RequireSignedTokens = true,
+                ValidAudience = config["JwtSettings:Audience"],
+                ValidIssuer = config["JwtSettings:Issuer"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtSettings:SecretKey"] ?? throw new ArgumentException()))
+            };
+        });
 
         var app = builder.Build();
 
@@ -56,6 +136,7 @@ public class Program
 
         app.UseHttpsRedirection();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();

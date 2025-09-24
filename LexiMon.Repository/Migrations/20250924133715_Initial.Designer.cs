@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LexiMon.Repository.Migrations
 {
     [DbContext(typeof(LexiMonDbContext))]
-    [Migration("20250920090223_Initial")]
+    [Migration("20250924133715_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -219,7 +219,7 @@ namespace LexiMon.Repository.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset>("BirthDate")
+                    b.Property<DateTimeOffset?>("BirthDate")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<decimal>("Coins")
@@ -306,6 +306,74 @@ namespace LexiMon.Repository.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "5d7efb6d-0d52-4159-ab2e-7fd356973925",
+                            AccessFailedCount = 0,
+                            Coins = 0m,
+                            ConcurrencyStamp = "d41f1b3b-5e13-4d6f-8c8f-0fd81eabd1b7",
+                            CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DeletedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Email = "free@example.com",
+                            EmailConfirmed = true,
+                            Gender = 3,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "FREE@EXAMPLE.COM",
+                            NormalizedUserName = "FREE@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBC/lkSeoZ46+xuABj9kE2nklYAUHL+v4pKdM/Qc2NO3/uaAbfTgXnqy9ydWrvOAOg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "ac4b9eee-416f-47ab-b3e3-66bf18891002",
+                            Status = true,
+                            TwoFactorEnabled = false,
+                            UpdatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            UserName = "free@example.com"
+                        },
+                        new
+                        {
+                            Id = "c2765f80-383f-46f2-9a73-ec47863100ae",
+                            AccessFailedCount = 0,
+                            Coins = 0m,
+                            ConcurrencyStamp = "c1e80f44-847f-43fe-80bd-78e45911626e",
+                            CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DeletedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Email = "premium@example.com",
+                            EmailConfirmed = true,
+                            Gender = 3,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "PREMIUM@EXAMPLE.COM",
+                            NormalizedUserName = "PREMIUM@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAECVxcsnljHtYG+4HT6G50Bx1CEhPcdzhLqHAI6HzQHkKS6FSPu0oMe+W38q/lbAqtQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "711dd757-a308-47de-8e5e-14e0ea0dd402",
+                            Status = true,
+                            TwoFactorEnabled = false,
+                            UpdatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            UserName = "premium@example.com"
+                        },
+                        new
+                        {
+                            Id = "88f1581b-4f4e-4831-8cf8-ee4afed04c11",
+                            AccessFailedCount = 0,
+                            Coins = 0m,
+                            ConcurrencyStamp = "c95d742e-a31a-4305-8d8b-6381ddbb9d3a",
+                            CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DeletedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Email = "admin@example.com",
+                            EmailConfirmed = true,
+                            Gender = 3,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@EXAMPLE.COM",
+                            NormalizedUserName = "ADMIN@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEE7LsaSFavSNJjM9eVR32coasBhP6B+7BZaOX2M+6HO6unE7Tdk8LIDlRz1zMLicZA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "d40ac6ba-c30c-469e-9a2a-b7fd9dad2697",
+                            Status = true,
+                            TwoFactorEnabled = false,
+                            UpdatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            UserName = "admin@example.com"
+                        });
                 });
 
             modelBuilder.Entity("LexiMon.Repository.Domains.Category", b =>
@@ -939,6 +1007,29 @@ namespace LexiMon.Repository.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "3631e38b-60dd-4d1a-af7f-a26f21c2ef82",
+                            ConcurrencyStamp = "3631e38b-60dd-4d1a-af7f-a26f21c2ef82",
+                            Name = "Free",
+                            NormalizedName = "FREE"
+                        },
+                        new
+                        {
+                            Id = "51ef7e08-ff07-459b-8c55-c7ebac505103",
+                            ConcurrencyStamp = "51ef7e08-ff07-459b-8c55-c7ebac505103",
+                            Name = "Premium",
+                            NormalizedName = "PREMIUM"
+                        },
+                        new
+                        {
+                            Id = "37a7c5df-4898-4fd4-8e5f-d2abd4b57520",
+                            ConcurrencyStamp = "37a7c5df-4898-4fd4-8e5f-d2abd4b57520",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1026,6 +1117,23 @@ namespace LexiMon.Repository.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "5d7efb6d-0d52-4159-ab2e-7fd356973925",
+                            RoleId = "3631e38b-60dd-4d1a-af7f-a26f21c2ef82"
+                        },
+                        new
+                        {
+                            UserId = "c2765f80-383f-46f2-9a73-ec47863100ae",
+                            RoleId = "51ef7e08-ff07-459b-8c55-c7ebac505103"
+                        },
+                        new
+                        {
+                            UserId = "88f1581b-4f4e-4831-8cf8-ee4afed04c11",
+                            RoleId = "37a7c5df-4898-4fd4-8e5f-d2abd4b57520"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
