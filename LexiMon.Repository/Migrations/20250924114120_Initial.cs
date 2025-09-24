@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace LexiMon.Repository.Migrations
 {
     /// <inheritdoc />
@@ -665,6 +667,36 @@ namespace LexiMon.Repository.Migrations
                         principalTable: "Question",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "3631e38b-60dd-4d1a-af7f-a26f21c2ef82", "3631e38b-60dd-4d1a-af7f-a26f21c2ef82", "Free", "FREE" },
+                    { "37a7c5df-4898-4fd4-8e5f-d2abd4b57520", "37a7c5df-4898-4fd4-8e5f-d2abd4b57520", "Admin", "ADMIN" },
+                    { "51ef7e08-ff07-459b-8c55-c7ebac505103", "51ef7e08-ff07-459b-8c55-c7ebac505103", "Premium", "PREMIUM" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "Address", "BirthDate", "ConcurrencyStamp", "CreatedAt", "DeletedAt", "Email", "EmailConfirmed", "FirstName", "Gender", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "Status", "TwoFactorEnabled", "UpdatedAt", "UserName" },
+                values: new object[,]
+                {
+                    { "5d7efb6d-0d52-4159-ab2e-7fd356973925", 0, null, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "406119b3-ec08-458d-8648-a2ec806cd836", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com", true, null, 0, null, false, null, "FREE@EXAMPLE.COM", "FREE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEIjKc2QzwViqpRabouGPtxxqQpvORo+DcOUcJ6VeQ+R140hCeY9L5uHm5x9/KQF8kQ==", null, false, "45845227-b861-44db-9f9e-4e9ec79be4fb", false, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com" },
+                    { "88f1581b-4f4e-4831-8cf8-ee4afed04c11", 0, null, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "54edea63-a438-4475-a5c3-1bb0d1113d48", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com", true, null, 0, null, false, null, "ADMIN@EXAMPLE.COM", "ADMIN@EXAMPLE.COM", "AQAAAAIAAYagAAAAECqSh1tnkJcAUO4B8QreeZm5JV+2OZ0mMiNLZsVIfEmYyg+dQKGtQTp3QHwQaejFUA==", null, false, "173691d3-3b66-48d9-9033-915bbd40be95", false, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com" },
+                    { "c2765f80-383f-46f2-9a73-ec47863100ae", 0, null, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "7858086b-c4e3-401e-946e-caa427cd2244", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com", true, null, 0, null, false, null, "PREMIUM@EXAMPLE.COM", "PREMIUM@EXAMPLE.COM", "AQAAAAIAAYagAAAAEJyVf39Ub7saxVkn63riTt5b9gt7Rpl+zJtqIPlv5fX2DEiFgUAMnwrP9+Sm+Evpiw==", null, false, "f12698da-529b-490d-a20c-b3741030a495", false, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[,]
+                {
+                    { "3631e38b-60dd-4d1a-af7f-a26f21c2ef82", "5d7efb6d-0d52-4159-ab2e-7fd356973925" },
+                    { "37a7c5df-4898-4fd4-8e5f-d2abd4b57520", "88f1581b-4f4e-4831-8cf8-ee4afed04c11" },
+                    { "51ef7e08-ff07-459b-8c55-c7ebac505103", "c2765f80-383f-46f2-9a73-ec47863100ae" }
                 });
 
             migrationBuilder.CreateIndex(

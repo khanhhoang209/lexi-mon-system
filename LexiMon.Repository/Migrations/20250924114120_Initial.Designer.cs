@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LexiMon.Repository.Migrations
 {
     [DbContext(typeof(LexiMonDbContext))]
-    [Migration("20250920090223_Initial")]
+    [Migration("20250924114120_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -306,6 +306,77 @@ namespace LexiMon.Repository.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "5d7efb6d-0d52-4159-ab2e-7fd356973925",
+                            AccessFailedCount = 0,
+                            BirthDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Coins = 0m,
+                            ConcurrencyStamp = "406119b3-ec08-458d-8648-a2ec806cd836",
+                            CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DeletedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Email = "free@example.com",
+                            EmailConfirmed = true,
+                            Gender = 0,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "FREE@EXAMPLE.COM",
+                            NormalizedUserName = "FREE@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIjKc2QzwViqpRabouGPtxxqQpvORo+DcOUcJ6VeQ+R140hCeY9L5uHm5x9/KQF8kQ==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "45845227-b861-44db-9f9e-4e9ec79be4fb",
+                            Status = false,
+                            TwoFactorEnabled = false,
+                            UpdatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            UserName = "free@example.com"
+                        },
+                        new
+                        {
+                            Id = "c2765f80-383f-46f2-9a73-ec47863100ae",
+                            AccessFailedCount = 0,
+                            BirthDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Coins = 0m,
+                            ConcurrencyStamp = "7858086b-c4e3-401e-946e-caa427cd2244",
+                            CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DeletedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Email = "premium@example.com",
+                            EmailConfirmed = true,
+                            Gender = 0,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "PREMIUM@EXAMPLE.COM",
+                            NormalizedUserName = "PREMIUM@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJyVf39Ub7saxVkn63riTt5b9gt7Rpl+zJtqIPlv5fX2DEiFgUAMnwrP9+Sm+Evpiw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "f12698da-529b-490d-a20c-b3741030a495",
+                            Status = false,
+                            TwoFactorEnabled = false,
+                            UpdatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            UserName = "premium@example.com"
+                        },
+                        new
+                        {
+                            Id = "88f1581b-4f4e-4831-8cf8-ee4afed04c11",
+                            AccessFailedCount = 0,
+                            BirthDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Coins = 0m,
+                            ConcurrencyStamp = "54edea63-a438-4475-a5c3-1bb0d1113d48",
+                            CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            DeletedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Email = "admin@example.com",
+                            EmailConfirmed = true,
+                            Gender = 0,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@EXAMPLE.COM",
+                            NormalizedUserName = "ADMIN@EXAMPLE.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAECqSh1tnkJcAUO4B8QreeZm5JV+2OZ0mMiNLZsVIfEmYyg+dQKGtQTp3QHwQaejFUA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "173691d3-3b66-48d9-9033-915bbd40be95",
+                            Status = false,
+                            TwoFactorEnabled = false,
+                            UpdatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            UserName = "admin@example.com"
+                        });
                 });
 
             modelBuilder.Entity("LexiMon.Repository.Domains.Category", b =>
@@ -939,6 +1010,29 @@ namespace LexiMon.Repository.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "3631e38b-60dd-4d1a-af7f-a26f21c2ef82",
+                            ConcurrencyStamp = "3631e38b-60dd-4d1a-af7f-a26f21c2ef82",
+                            Name = "Free",
+                            NormalizedName = "FREE"
+                        },
+                        new
+                        {
+                            Id = "51ef7e08-ff07-459b-8c55-c7ebac505103",
+                            ConcurrencyStamp = "51ef7e08-ff07-459b-8c55-c7ebac505103",
+                            Name = "Premium",
+                            NormalizedName = "PREMIUM"
+                        },
+                        new
+                        {
+                            Id = "37a7c5df-4898-4fd4-8e5f-d2abd4b57520",
+                            ConcurrencyStamp = "37a7c5df-4898-4fd4-8e5f-d2abd4b57520",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1026,6 +1120,23 @@ namespace LexiMon.Repository.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "5d7efb6d-0d52-4159-ab2e-7fd356973925",
+                            RoleId = "3631e38b-60dd-4d1a-af7f-a26f21c2ef82"
+                        },
+                        new
+                        {
+                            UserId = "c2765f80-383f-46f2-9a73-ec47863100ae",
+                            RoleId = "51ef7e08-ff07-459b-8c55-c7ebac505103"
+                        },
+                        new
+                        {
+                            UserId = "88f1581b-4f4e-4831-8cf8-ee4afed04c11",
+                            RoleId = "37a7c5df-4898-4fd4-8e5f-d2abd4b57520"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
