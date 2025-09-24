@@ -1,4 +1,5 @@
 ﻿using LexiMon.Repository.Domains;
+using LexiMon.Repository.Enum;
 using LexiMon.Repository.Interfaces;
 using LexiMon.Service.ApiResponse;
 using LexiMon.Service.Interfaces;
@@ -60,6 +61,59 @@ public class UserService : IUserService
             Succeeded = true,
             Message = "Đăng nhập thành công!",
             Data = response
+        };
+    }
+
+    public async Task<ServiceResponse> RegisterAsync(RegisterRequestDto requestBody, string role)
+    {
+        var user = await _userManager.FindByEmailAsync(requestBody.Email);
+        if (user != null)
+        {
+            return new ServiceResponse()
+            {
+                Succeeded = false,
+                Message = "Tài khoản đã tồn tại!",
+            };
+        }
+
+        user = new ApplicationUser()
+        {
+            UserName = requestBody.Email,
+            Email = requestBody.Email,
+            FirstName = requestBody.FirstName,
+            LastName = requestBody.LastName,
+            Address = requestBody.Address,
+            BirthDate = requestBody.BirthDate,
+            Gender = requestBody.Gender ?? Gender.Other
+        };
+
+        var result = await _userManager.CreateAsync(user, requestBody.Password);
+        if (!result.Succeeded)
+        {
+            return new ServiceResponse
+            {
+                Succeeded = false,
+                Message = "Không thể tạo tài khoản. Vui lòng thử lại!",
+            };
+        }
+
+        var addToRoleResult = await _userManager.AddToRoleAsync(user, role);
+        if (!addToRoleResult.Succeeded)
+        {
+            await _userManager.DeleteAsync(user);
+            return new ServiceResponse
+            {
+                Succeeded = false,
+                Message = "Không thể tạo tài khoản. Vui lòng thử lại!",
+            };
+        }
+
+        _logger.LogInformation("User {Email} registered successfully with role {Role}", requestBody.Email, role);
+        return new ResponseData<string>()
+        {
+            Succeeded = true,
+            Message = "Tạo tài khoản thành công!",
+            Data = user.Id
         };
     }
 }

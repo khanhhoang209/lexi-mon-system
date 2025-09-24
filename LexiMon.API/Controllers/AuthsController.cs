@@ -26,4 +26,18 @@ public class AuthsController
 
         return TypedResults.Unauthorized();
     }
+
+    [HttpPost("{role}/register")]
+    public async Task<IResult> RegisterAsync(
+        [FromBody] RegisterRequestDto requestBody,
+        [FromRoute] string role)
+    {
+        var serviceResponse = await _userService.RegisterAsync(requestBody, role);
+        if (serviceResponse.Succeeded)
+        {
+            return TypedResults.Ok(serviceResponse);
+        }
+
+        return TypedResults.BadRequest(serviceResponse);
+    }
 }
