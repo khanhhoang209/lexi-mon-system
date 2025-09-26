@@ -15,6 +15,9 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
             .IsRequired(false)
             .HasMaxLength(1000);
         
+        builder.Property(l => l.Title)
+            .HasMaxLength(300);
+        
         builder.HasOne(l => l.Course)
             .WithMany(c => c.Lessons)
             .HasForeignKey(l => l.CourseId)

@@ -58,7 +58,9 @@ public interface IGenericRepository<T, TId> where T : BaseEntity<TId>
         T entity,
         CancellationToken cancellationToken = default
     );
-
+    Task HardRemoveRangeAsync
+        (IEnumerable<T> entities, 
+        CancellationToken cancellationToken = default);
     Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default
     );

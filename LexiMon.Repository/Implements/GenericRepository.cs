@@ -185,7 +185,11 @@ public class GenericRepository<T, TId> : IGenericRepository<T, TId>
         _dbContext.Entry(entity).State = EntityState.Modified;
         return Task.CompletedTask;
     }
-
+    public Task HardRemoveRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
+    {
+        _dbSet.RemoveRange(entities);
+        return Task.CompletedTask;
+    }
     public virtual async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default
     )
