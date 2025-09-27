@@ -136,6 +136,23 @@ namespace LexiMon.Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CustomLesson",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomLesson", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "EnemyLevel",
                 columns: table => new
                 {
@@ -383,6 +400,7 @@ namespace LexiMon.Repository.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     CourseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Status = table.Column<bool>(type: "bit", nullable: false),
@@ -427,6 +445,12 @@ namespace LexiMon.Repository.Migrations
                         name: "FK_UserDeck_Course_CourseId",
                         column: x => x.CourseId,
                         principalTable: "Course",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserDeck_CustomLesson_CustomLessonId",
+                        column: x => x.CustomLessonId,
+                        principalTable: "CustomLesson",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -563,29 +587,6 @@ namespace LexiMon.Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CustomLesson",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    UserDeckId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Status = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CustomLesson", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CustomLesson_UserDeck_UserDeckId",
-                        column: x => x.UserDeckId,
-                        principalTable: "UserDeck",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "LessonProgress",
                 columns: table => new
                 {
@@ -684,9 +685,9 @@ namespace LexiMon.Repository.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "Address", "BirthDate", "ConcurrencyStamp", "CreatedAt", "DeletedAt", "Email", "EmailConfirmed", "FirstName", "Gender", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "Status", "TwoFactorEnabled", "UpdatedAt", "UserName" },
                 values: new object[,]
                 {
-                    { "5d7efb6d-0d52-4159-ab2e-7fd356973925", 0, null, null, "d41f1b3b-5e13-4d6f-8c8f-0fd81eabd1b7", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com", true, null, 3, null, false, null, "FREE@EXAMPLE.COM", "FREE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEBC/lkSeoZ46+xuABj9kE2nklYAUHL+v4pKdM/Qc2NO3/uaAbfTgXnqy9ydWrvOAOg==", null, false, "ac4b9eee-416f-47ab-b3e3-66bf18891002", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com" },
-                    { "88f1581b-4f4e-4831-8cf8-ee4afed04c11", 0, null, null, "c95d742e-a31a-4305-8d8b-6381ddbb9d3a", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com", true, null, 3, null, false, null, "ADMIN@EXAMPLE.COM", "ADMIN@EXAMPLE.COM", "AQAAAAIAAYagAAAAEE7LsaSFavSNJjM9eVR32coasBhP6B+7BZaOX2M+6HO6unE7Tdk8LIDlRz1zMLicZA==", null, false, "d40ac6ba-c30c-469e-9a2a-b7fd9dad2697", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com" },
-                    { "c2765f80-383f-46f2-9a73-ec47863100ae", 0, null, null, "c1e80f44-847f-43fe-80bd-78e45911626e", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com", true, null, 3, null, false, null, "PREMIUM@EXAMPLE.COM", "PREMIUM@EXAMPLE.COM", "AQAAAAIAAYagAAAAECVxcsnljHtYG+4HT6G50Bx1CEhPcdzhLqHAI6HzQHkKS6FSPu0oMe+W38q/lbAqtQ==", null, false, "711dd757-a308-47de-8e5e-14e0ea0dd402", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com" }
+                    { "5d7efb6d-0d52-4159-ab2e-7fd356973925", 0, null, null, "853b0292-4c2d-4f5e-b5db-bfaf230b175a", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com", true, null, 3, null, false, null, "FREE@EXAMPLE.COM", "FREE@EXAMPLE.COM", "AQAAAAIAAYagAAAAENd3OyfLXbQ8puMff1KWnkd4JBQXeBYpi+SwTnMCwFE+MSUx5Hh4lnjwd6GlK9RWJA==", null, false, "60f25bbd-68bb-4a89-9411-31ca5e911c74", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com" },
+                    { "88f1581b-4f4e-4831-8cf8-ee4afed04c11", 0, null, null, "3cbae42b-b20a-45e1-b23d-4a3fdfab5ef3", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com", true, null, 3, null, false, null, "ADMIN@EXAMPLE.COM", "ADMIN@EXAMPLE.COM", "AQAAAAIAAYagAAAAEM8CFEDjHtlbdXA55m1VyJ9mBwEiD9U2B/Mu4Bpo0lg4W4mnIzbKRv0yNH40iE2xXA==", null, false, "5a2fb414-91fa-44a6-bfb1-8a7673a406a1", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com" },
+                    { "c2765f80-383f-46f2-9a73-ec47863100ae", 0, null, null, "b221165a-6e28-4eb4-908b-1eaa1704e006", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com", true, null, 3, null, false, null, "PREMIUM@EXAMPLE.COM", "PREMIUM@EXAMPLE.COM", "AQAAAAIAAYagAAAAEGQkdj6aQPYGXrrVNVtdEpTGTzXwD8DDa9xqZaBJ2ZcRrxi7Lxyb5DH4otJIe8HGyw==", null, false, "323b022a-2906-4a68-afdb-eb21dd685b8f", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -765,11 +766,6 @@ namespace LexiMon.Repository.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomLesson_UserDeckId",
-                table: "CustomLesson",
-                column: "UserDeckId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Enemy_EnemyLevelId",
                 table: "Enemy",
                 column: "EnemyLevelId");
@@ -838,6 +834,11 @@ namespace LexiMon.Repository.Migrations
                 column: "CourseId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserDeck_CustomLessonId",
+                table: "UserDeck",
+                column: "CustomLessonId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserDeck_UserId",
                 table: "UserDeck",
                 column: "UserId");
@@ -889,6 +890,9 @@ namespace LexiMon.Repository.Migrations
                 name: "Product");
 
             migrationBuilder.DropTable(
+                name: "UserDeck");
+
+            migrationBuilder.DropTable(
                 name: "Achievement");
 
             migrationBuilder.DropTable(
@@ -916,13 +920,10 @@ namespace LexiMon.Repository.Migrations
                 name: "Lesson");
 
             migrationBuilder.DropTable(
-                name: "Category");
-
-            migrationBuilder.DropTable(
-                name: "UserDeck");
-
-            migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Category");
 
             migrationBuilder.DropTable(
                 name: "Course");

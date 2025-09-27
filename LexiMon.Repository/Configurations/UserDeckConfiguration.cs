@@ -22,6 +22,11 @@ public class UserDeckConfiguration : IEntityTypeConfiguration<UserDeck>
             .HasForeignKey(x => x.CourseId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasOne(x => x.CustomLesson)
+            .WithMany(x => x.UserDeck)
+            .HasForeignKey(x => x.CustomLessonId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
         builder.ConfigureAuditableProperties();
     }
 }

@@ -310,7 +310,7 @@ namespace LexiMon.Repository.Migrations
                             Id = "5d7efb6d-0d52-4159-ab2e-7fd356973925",
                             AccessFailedCount = 0,
                             Coins = 0m,
-                            ConcurrencyStamp = "d41f1b3b-5e13-4d6f-8c8f-0fd81eabd1b7",
+                            ConcurrencyStamp = "853b0292-4c2d-4f5e-b5db-bfaf230b175a",
                             CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             DeletedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "free@example.com",
@@ -319,9 +319,9 @@ namespace LexiMon.Repository.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "FREE@EXAMPLE.COM",
                             NormalizedUserName = "FREE@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBC/lkSeoZ46+xuABj9kE2nklYAUHL+v4pKdM/Qc2NO3/uaAbfTgXnqy9ydWrvOAOg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENd3OyfLXbQ8puMff1KWnkd4JBQXeBYpi+SwTnMCwFE+MSUx5Hh4lnjwd6GlK9RWJA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "ac4b9eee-416f-47ab-b3e3-66bf18891002",
+                            SecurityStamp = "60f25bbd-68bb-4a89-9411-31ca5e911c74",
                             Status = true,
                             TwoFactorEnabled = false,
                             UpdatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
@@ -332,7 +332,7 @@ namespace LexiMon.Repository.Migrations
                             Id = "c2765f80-383f-46f2-9a73-ec47863100ae",
                             AccessFailedCount = 0,
                             Coins = 0m,
-                            ConcurrencyStamp = "c1e80f44-847f-43fe-80bd-78e45911626e",
+                            ConcurrencyStamp = "b221165a-6e28-4eb4-908b-1eaa1704e006",
                             CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             DeletedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "premium@example.com",
@@ -341,9 +341,9 @@ namespace LexiMon.Repository.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "PREMIUM@EXAMPLE.COM",
                             NormalizedUserName = "PREMIUM@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAECVxcsnljHtYG+4HT6G50Bx1CEhPcdzhLqHAI6HzQHkKS6FSPu0oMe+W38q/lbAqtQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGQkdj6aQPYGXrrVNVtdEpTGTzXwD8DDa9xqZaBJ2ZcRrxi7Lxyb5DH4otJIe8HGyw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "711dd757-a308-47de-8e5e-14e0ea0dd402",
+                            SecurityStamp = "323b022a-2906-4a68-afdb-eb21dd685b8f",
                             Status = true,
                             TwoFactorEnabled = false,
                             UpdatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
@@ -354,7 +354,7 @@ namespace LexiMon.Repository.Migrations
                             Id = "88f1581b-4f4e-4831-8cf8-ee4afed04c11",
                             AccessFailedCount = 0,
                             Coins = 0m,
-                            ConcurrencyStamp = "c95d742e-a31a-4305-8d8b-6381ddbb9d3a",
+                            ConcurrencyStamp = "3cbae42b-b20a-45e1-b23d-4a3fdfab5ef3",
                             CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             DeletedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "admin@example.com",
@@ -363,9 +363,9 @@ namespace LexiMon.Repository.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEE7LsaSFavSNJjM9eVR32coasBhP6B+7BZaOX2M+6HO6unE7Tdk8LIDlRz1zMLicZA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEM8CFEDjHtlbdXA55m1VyJ9mBwEiD9U2B/Mu4Bpo0lg4W4mnIzbKRv0yNH40iE2xXA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "d40ac6ba-c30c-469e-9a2a-b7fd9dad2697",
+                            SecurityStamp = "5a2fb414-91fa-44a6-bfb1-8a7673a406a1",
                             Status = true,
                             TwoFactorEnabled = false,
                             UpdatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
@@ -515,15 +515,15 @@ namespace LexiMon.Repository.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("UserDeckId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserDeckId");
 
                     b.ToTable("CustomLesson", (string)null);
                 });
@@ -725,6 +725,11 @@ namespace LexiMon.Repository.Migrations
 
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
@@ -974,6 +979,8 @@ namespace LexiMon.Repository.Migrations
 
                     b.HasIndex("CourseId");
 
+                    b.HasIndex("CustomLessonId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("UserDeck", (string)null);
@@ -1212,17 +1219,6 @@ namespace LexiMon.Repository.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LexiMon.Repository.Domains.CustomLesson", b =>
-                {
-                    b.HasOne("LexiMon.Repository.Domains.UserDeck", "UserDeck")
-                        .WithMany("CustomLessons")
-                        .HasForeignKey("UserDeckId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("UserDeck");
-                });
-
             modelBuilder.Entity("LexiMon.Repository.Domains.Enemy", b =>
                 {
                     b.HasOne("LexiMon.Repository.Domains.EnemyLevel", "EnemyLevel")
@@ -1340,6 +1336,11 @@ namespace LexiMon.Repository.Migrations
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("LexiMon.Repository.Domains.CustomLesson", "CustomLesson")
+                        .WithMany("UserDeck")
+                        .HasForeignKey("CustomLessonId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("LexiMon.Repository.Domains.ApplicationUser", "User")
                         .WithMany("UserDecks")
                         .HasForeignKey("UserId")
@@ -1347,6 +1348,8 @@ namespace LexiMon.Repository.Migrations
                         .IsRequired();
 
                     b.Navigation("Course");
+
+                    b.Navigation("CustomLesson");
 
                     b.Navigation("User");
                 });
@@ -1447,6 +1450,8 @@ namespace LexiMon.Repository.Migrations
                     b.Navigation("LessonProgress");
 
                     b.Navigation("Questions");
+
+                    b.Navigation("UserDeck");
                 });
 
             modelBuilder.Entity("LexiMon.Repository.Domains.EnemyLevel", b =>
@@ -1473,11 +1478,6 @@ namespace LexiMon.Repository.Migrations
             modelBuilder.Entity("LexiMon.Repository.Domains.Question", b =>
                 {
                     b.Navigation("Answers");
-                });
-
-            modelBuilder.Entity("LexiMon.Repository.Domains.UserDeck", b =>
-                {
-                    b.Navigation("CustomLessons");
                 });
 #pragma warning restore 612, 618
         }
