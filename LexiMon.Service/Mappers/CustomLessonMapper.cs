@@ -25,6 +25,7 @@ public static class CustomLessonMapper
             Id = Guid.NewGuid(),
             Title = request.Title,
             Description = request.Description,
+            Status = true
         };
     }
 
