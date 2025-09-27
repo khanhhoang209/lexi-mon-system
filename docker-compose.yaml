@@ -1,5 +1,7 @@
-﻿services:
-  leximon.api:
+﻿version: "3.9"
+
+services:
+  leximon-api:
     image: leximon.api
     container_name: leximon-api
     build:
@@ -10,33 +12,31 @@
     ports:
       - "8080:8080"
     environment:
-      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
     depends_on:
-      leximon.db:
+      leximon-db:
         condition: service_healthy
-    restart: no
+    restart: unless-stopped
     networks:
       - leximon-network
 
-  leximon.db:
+  leximon-db:
     image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: leximon-db
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=12345aA#
-      - MSSQL_PID=Express
     env_file:
       - .env
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SA_PASSWORD}
+      - MSSQL_PID=${MSSQL_PID}
     volumes:
       - sqlserverdata:/var/opt/mssql
-    ports:
-      - "1433:1433"
     healthcheck:
-      test: [ "CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $$SA_PASSWORD -Q 'SELECT 1' || exit 1" ]
+      test: [ "CMD-SHELL", "timeout 2 bash -lc '</dev/tcp/localhost/1433' || exit 1" ]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 20s
+      retries: 20
+      start_period: 30s
     networks:
       - leximon-network
 
