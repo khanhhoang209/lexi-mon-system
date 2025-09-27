@@ -38,12 +38,12 @@ public class Program
         builder.Services.AddScoped<IQuestionService, QuestionService>();
         builder.Services.AddScoped<ICourseService, CourseService>();
         builder.Services.AddScoped<ILessonService, LessonService>();
-        
+
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         builder.Services.AddScoped<ITokenRepository, TokenRepository>();
-        
+
         // Add services to the container.
         builder.Services.AddControllers();
         builder.Services.AddAuthorization();
@@ -139,7 +139,7 @@ public class Program
         app.UseSwagger();
         app.UseSwaggerUI();
 
-        app.UseHttpsRedirection();
+        // app.UseHttpsRedirection();
 
         app.UseAuthentication();
         app.UseAuthorization();
