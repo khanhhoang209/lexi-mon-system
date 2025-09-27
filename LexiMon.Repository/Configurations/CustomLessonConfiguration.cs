@@ -18,11 +18,8 @@ public class CustomLessonConfiguration : IEntityTypeConfiguration<CustomLesson>
             .HasMaxLength(1000)
             .IsRequired(false);
         
-        builder.HasOne(cl => cl.UserDeck)
-            .WithMany(ud => ud.CustomLessons)
-            .HasForeignKey(cl => cl.UserDeckId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.Property(cl => cl.Title)
+            .HasMaxLength(300);
         
         builder.HasOne(cl => cl.LessonProgress)
             .WithOne(lp => lp.CustomLesson)

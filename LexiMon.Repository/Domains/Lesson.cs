@@ -4,6 +4,7 @@ namespace LexiMon.Repository.Domains;
 
 public class Lesson : BaseAuditableEntity<Guid>
 {
+    public string Title { get; set; } = null!;
     public string? Description { get; set; }
     public Guid CourseId { get; set; }
     public Course Course { get; set; } = null!;
