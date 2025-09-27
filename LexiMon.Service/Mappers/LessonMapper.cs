@@ -27,7 +27,8 @@ public static class LessonMapper
             Id = Guid.NewGuid(),
             Title = request.Title,
             Description = request.Description,
-            CourseId = request.CourseId
+            CourseId = request.CourseId,
+            Status = true
         };
     }
 

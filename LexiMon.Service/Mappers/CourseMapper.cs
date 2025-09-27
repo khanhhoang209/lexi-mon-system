@@ -31,7 +31,8 @@ public static class CourseMapper
             ImageUrl = request.ImageUrl,
             Price = request.Price,
             Coin = request.Coin,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            Status = true,
         };
     }
 
