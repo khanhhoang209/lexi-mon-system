@@ -8,5 +8,5 @@ public class PaginatedResponse<T> : ServiceResponse
     public int TotalPages { get; set; }
     public bool HasPreviousPage => PageNumber > 1;
     public bool HasNextPage => PageNumber < TotalPages;
-    public T? Data { get; set; } = default!;
+    public List<T> Data { get; set; } = [];
 }
