@@ -181,6 +181,7 @@ public class QuestionService : IQuestionService
                 LessonTitle = q.Lesson != null ? q.Lesson.Title : null,
                 CustomLessonId = q.CustomLessonId,
                 CustomLessonTitle = q.CustomLesson != null ? q.CustomLesson.Title : null,
+                IsActive = q.Status,
                 Answers = q.Answers.Select(a => new AnswerResponseDto
                 {
                     AnswerId = a.Id,
@@ -224,7 +225,7 @@ public class QuestionService : IQuestionService
         
         var questionRepo = _unitOfWork.GetRepository<Question, Guid>();
         var query = questionRepo.Query()
-            .Where(q => q.LessonId == lessonId)
+            .Where(q => q.LessonId == lessonId && q.Status == true)
             .Include(q => q.Answers.Where(a => a.Status))
             .AsNoTracking();
         if(!string.IsNullOrEmpty(request.QuestionContent))
@@ -242,6 +243,7 @@ public class QuestionService : IQuestionService
                 Content = q.Content,
                 LessonId = q.LessonId,
                 LessonTitle = q.Lesson != null ? q.Lesson.Title : null,
+                IsActive = q.Status,
                 Answers = q.Answers.Select(a => new AnswerResponseDto
                 {
                     AnswerId = a.Id,
@@ -302,6 +304,7 @@ public class QuestionService : IQuestionService
                 Content = q.Content,
                 CustomLessonId = q.CustomLessonId,
                 CustomLessonTitle = q.CustomLesson != null ? q.CustomLesson.Title : null,
+                IsActive = q.Status,
                 Answers = q.Answers.Select(a => new AnswerResponseDto
                 {
                     AnswerId = a.Id,
