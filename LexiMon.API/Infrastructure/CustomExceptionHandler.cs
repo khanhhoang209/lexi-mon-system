@@ -1,0 +1,93 @@
+﻿using LexiMon.Service.ApiResponse;
+using Microsoft.AspNetCore.Diagnostics;
+
+namespace LexiMon.API.Infrastructure;
+
+public class CustomExceptionHandler : IExceptionHandler
+{
+    private readonly Dictionary<Type, Func<HttpContext, Exception, Task>> _exceptionHandlers;
+
+    public CustomExceptionHandler()
+    {
+        // Register known exception types and handlers.
+        _exceptionHandlers = new Dictionary<Type, Func<HttpContext, Exception, Task>>
+        {
+            { typeof(InvalidOperationException), HandleInvalidOperationException },
+            { typeof(ArgumentException), HandleArgumentException },
+            { typeof(ArgumentNullException), HandleArgumentException },
+            { typeof(KeyNotFoundException), HandleNotFoundError },
+            { typeof(UnauthorizedAccessException), HandleUnauthorizedError }
+        };
+    }
+
+
+    public async ValueTask<bool> TryHandleAsync(
+        HttpContext httpContext,
+        Exception exception,
+        CancellationToken cancellationToken)
+    {
+        var exceptionType = exception.GetType();
+
+        var handler = _exceptionHandlers
+            .FirstOrDefault(h => h.Key.IsAssignableFrom(exceptionType)).Value;
+
+        if (handler is null)
+        {
+            await HandleInternalServerError(httpContext, exception);
+            return true;
+        }
+
+        await handler.Invoke(httpContext, exception);
+        return true;
+    }
+
+    private async Task HandleInvalidOperationException(HttpContext httpContext, Exception ex)
+    {
+        httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+        await httpContext.Response.WriteAsJsonAsync(new ServiceResponse()
+        {
+            Succeeded = false,
+            Message = ex.Message
+        });
+    }
+
+    private async Task HandleArgumentException(HttpContext httpContext, Exception ex)
+    {
+        httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+        await httpContext.Response.WriteAsJsonAsync(new ServiceResponse()
+        {
+            Succeeded = false,
+            Message = ex.Message
+        });
+    }
+
+    private async Task HandleInternalServerError(HttpContext httpContext, Exception ex)
+    {
+        httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await httpContext.Response.WriteAsJsonAsync(new ServiceResponse()
+        {
+            Succeeded = false,
+            Message = "Lỗi không xác định từ server!"
+        });
+    }
+
+    private async Task HandleNotFoundError(HttpContext httpContext, Exception ex)
+    {
+        httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
+        await httpContext.Response.WriteAsJsonAsync(new ServiceResponse()
+        {
+            Succeeded = false,
+            Message = ex.Message
+        });
+    }
+
+    private async Task HandleUnauthorizedError(HttpContext httpContext, Exception ex)
+    {
+        httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        await httpContext.Response.WriteAsJsonAsync(new ServiceResponse()
+        {
+            Succeeded = false,
+            Message = ex.Message
+        });
+    }
+}
