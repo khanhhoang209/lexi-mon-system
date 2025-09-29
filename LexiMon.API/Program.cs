@@ -24,6 +24,8 @@ public class Program
         builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
 
         // Add custom exception handling middleware
+        builder.Services.AddProblemDetails();
+
         builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
         builder.Services.AddDbContext<LexiMonDbContext>((sp, options) =>
@@ -51,6 +53,8 @@ public class Program
         // Add services to the container.
         builder.Services.AddControllers();
         builder.Services.AddAuthorization();
+        builder.Services.AddRouting(options => options.LowercaseUrls = true);
+
 
         builder.Services.AddEndpointsApiExplorer();
 
@@ -150,7 +154,8 @@ public class Program
         // {
         // }
 
-        app.UseExceptionHandler("/Error");
+        app.UseExceptionHandler();
+        app.UseRouting();
 
         app.UseCors("AllowAll");
 
