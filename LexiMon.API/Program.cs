@@ -25,6 +25,7 @@ public class Program
 
         // Add custom exception handling middleware
         builder.Services.AddProblemDetails();
+
         builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
         builder.Services.AddDbContext<LexiMonDbContext>((sp, options) =>
