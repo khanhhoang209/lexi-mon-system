@@ -15,8 +15,6 @@ public class CustomExceptionHandler : IExceptionHandler
             { typeof(InvalidOperationException), HandleInvalidOperationException },
             { typeof(ArgumentException), HandleArgumentException },
             { typeof(ArgumentNullException), HandleArgumentException },
-            { typeof(KeyNotFoundException), HandleNotFoundError },
-            { typeof(UnauthorizedAccessException), HandleUnauthorizedError }
         };
     }
 
@@ -68,26 +66,6 @@ public class CustomExceptionHandler : IExceptionHandler
         {
             Succeeded = false,
             Message = "Lỗi không xác định từ server!"
-        });
-    }
-
-    private async Task HandleNotFoundError(HttpContext httpContext, Exception ex)
-    {
-        httpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-        await httpContext.Response.WriteAsJsonAsync(new ServiceResponse()
-        {
-            Succeeded = false,
-            Message = ex.Message
-        });
-    }
-
-    private async Task HandleUnauthorizedError(HttpContext httpContext, Exception ex)
-    {
-        httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-        await httpContext.Response.WriteAsJsonAsync(new ServiceResponse()
-        {
-            Succeeded = false,
-            Message = ex.Message
         });
     }
 }
