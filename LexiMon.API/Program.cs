@@ -1,4 +1,5 @@
 using System.Text;
+using LexiMon.API.Infrastructure;
 using LexiMon.Repository.Context;
 using LexiMon.Repository.Domains;
 using LexiMon.Repository.Implements;
@@ -21,6 +22,9 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+
+        // Add custom exception handling middleware
+        builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
         builder.Services.AddDbContext<LexiMonDbContext>((sp, options) =>
         {
@@ -145,6 +149,10 @@ public class Program
         // if (app.Environment.IsDevelopment())
         // {
         // }
+
+        app.UseExceptionHandler("/Error");
+
+        app.UseCors("AllowAll");
 
         using (var scope = app.Services.CreateScope())
         {
