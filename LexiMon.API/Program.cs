@@ -1,4 +1,5 @@
 using System.Text;
+using LexiMon.API.Infrastructure;
 using LexiMon.Repository.Context;
 using LexiMon.Repository.Domains;
 using LexiMon.Repository.Implements;
@@ -22,6 +23,10 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
 
+        // Add custom exception handling middleware
+        builder.Services.AddProblemDetails();
+        builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+
         builder.Services.AddDbContext<LexiMonDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
@@ -38,15 +43,17 @@ public class Program
         builder.Services.AddScoped<IQuestionService, QuestionService>();
         builder.Services.AddScoped<ICourseService, CourseService>();
         builder.Services.AddScoped<ILessonService, LessonService>();
-        
+
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         builder.Services.AddScoped<ITokenRepository, TokenRepository>();
-        
+
         // Add services to the container.
         builder.Services.AddControllers();
         builder.Services.AddAuthorization();
+        builder.Services.AddRouting(options => options.LowercaseUrls = true);
+
 
         builder.Services.AddEndpointsApiExplorer();
 
@@ -124,12 +131,32 @@ public class Program
             };
         });
 
+        // Configure CORS
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policy =>
+            {
+                policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader();
+            });
+        });
+
+        // Configure logging
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
         // if (app.Environment.IsDevelopment())
         // {
         // }
+
+        app.UseExceptionHandler();
+        app.UseRouting();
+
+        app.UseCors("AllowAll");
 
         using (var scope = app.Services.CreateScope())
         {
@@ -139,7 +166,7 @@ public class Program
         app.UseSwagger();
         app.UseSwaggerUI();
 
-        app.UseHttpsRedirection();
+        // app.UseHttpsRedirection();
 
         app.UseAuthentication();
         app.UseAuthorization();
