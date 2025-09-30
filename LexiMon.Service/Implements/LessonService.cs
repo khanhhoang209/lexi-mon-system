@@ -6,18 +6,21 @@ using LexiMon.Service.Mappers;
 using LexiMon.Service.Models.Requests;
 using LexiMon.Service.Models.Responses;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace LexiMon.Service.Implements;
 
 public class LessonService : ILessonService
 {
     private readonly IUnitOfWork _unitOfWork;
-    
-    public LessonService(IUnitOfWork unitOfWork)
+    private readonly ILogger<LessonService> _logger;
+
+    public LessonService(IUnitOfWork unitOfWork, ILogger<LessonService> logger)
     {
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
-    
+
     public async Task<ResponseData<Guid>> CreateLessonAsync(
         LessonRequestDto request, 
         CancellationToken cancellationToken = default)
@@ -26,6 +29,7 @@ public class LessonService : ILessonService
         var course = await courseRepo.GetByIdAsync(request.CourseId, cancellationToken);
         if (course == null)
         {
+            _logger.LogWarning("Cannot create lesson!! Course with Id: {CourseId} not found", request.CourseId);
             return new ResponseData<Guid>()
             {
                 Succeeded = false,
@@ -53,6 +57,7 @@ public class LessonService : ILessonService
         var course = await courseRepo.GetByIdAsync(request.CourseId, cancellationToken);
         if (course == null)
         {
+            _logger.LogWarning("Cannot update lesson!! Course with Id: {CourseId} not found", request.CourseId);
             return new ServiceResponse()
             {
                 Succeeded = false,
@@ -64,6 +69,7 @@ public class LessonService : ILessonService
         var lesson = await lessonRepo.GetByIdAsync(id, cancellationToken);
         if (lesson == null)
         {
+            _logger.LogWarning("Lesson with Id: {id} not found", id);
             return new ServiceResponse()
             {
                 Succeeded = false,
@@ -86,13 +92,16 @@ public class LessonService : ILessonService
     {
         var lessonRepo = _unitOfWork.GetRepository<Lesson, Guid>();
         var lesson = await lessonRepo.GetByIdAsync(id, cancellationToken);
-        if (lesson == null) 
+        if (lesson == null)
+        {
+            _logger.LogWarning("Cannot delete lesson!! Lesson with Id: {CourseId} not found", id);
             return new ServiceResponse()
             {
                 Succeeded = false,
                 Message = "Lesson not found!"
             };
-        
+        }
+
         await lessonRepo.RemoveAsync(lesson, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return new ServiceResponse() 
@@ -113,6 +122,7 @@ public class LessonService : ILessonService
         
         if (lessonResponse == null)
         {
+            _logger.LogWarning("Cannot get lesson!! Lesson with Id: {id} not found", id);
             return new ResponseData<LessonResponseDto>()
             {
                 Succeeded = false,
@@ -138,6 +148,7 @@ public class LessonService : ILessonService
         var course = await courseRepo.GetByIdAsync(courseId, cancellationToken);
         if (course == null)
         {
+            _logger.LogWarning("Cannot get lesson!! Course with Id: {CourseId} not found", courseId);
             return new PaginatedResponse<LessonResponseDto>()
             {
                 Succeeded = false,

@@ -11,7 +11,7 @@ public interface ICustomLessonService
         string userId,
         CancellationToken cancellationToken = default);
     
-    Task<ResponseData<Guid>> UpdateCustomLessonAsync(
+    Task<ServiceResponse> UpdateCustomLessonAsync(
         Guid id,
         CustomLessonRequestDto request,
         CancellationToken cancellationToken = default);

@@ -6,18 +6,21 @@ using LexiMon.Service.Mappers;
 using LexiMon.Service.Models.Requests;
 using LexiMon.Service.Models.Responses;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace LexiMon.Service.Implements;
 
 public class CourseService : ICourseService
 {
     private readonly IUnitOfWork _unitOfWork;
-    
-    public CourseService(IUnitOfWork unitOfWork)
+    private readonly ILogger<CourseService> _logger;
+
+    public CourseService(IUnitOfWork unitOfWork, ILogger<CourseService> logger)
     {
         _unitOfWork = unitOfWork;
+        _logger = logger;
     }
-    
+
     public async Task<ResponseData<Guid>> CreateCourseAsync(
         CourseRequestDto request,
         CancellationToken cancellationToken = default)
@@ -45,6 +48,7 @@ public class CourseService : ICourseService
             .FirstOrDefault(c => c.Id == id && c.Status);
         if (course == null)
         {
+            _logger.LogWarning("Course with id: {id} not found", id);
             return new ServiceResponse
             {
                 Succeeded = false,
@@ -55,10 +59,11 @@ public class CourseService : ICourseService
         course.UpdateCourse(request);
         await repo.UpdateAsync(course, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Course with id: {id} updated successfully!", id);
         return new ServiceResponse
         {
             Succeeded = true,
-            Message = "Course updated successfully"
+            Message = "Course updated successfully!"
         };
 }
 
@@ -69,6 +74,7 @@ public class CourseService : ICourseService
         var course = await repo.GetByIdAsync(id, cancellationToken);
         if (course == null)
         {
+            _logger.LogWarning("Course with id: {id} not found", id);
             return new ServiceResponse
             {
                 Succeeded = false,
@@ -78,6 +84,7 @@ public class CourseService : ICourseService
         
         await repo.RemoveAsync(course, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Course with id: {id} deleted successfully", id);
         return new ServiceResponse
         {
             Succeeded = true,
@@ -92,15 +99,18 @@ public class CourseService : ICourseService
         var course = await repo.GetByIdAsync(id, cancellationToken);
         if (course == null)
         {
+            
+            _logger.LogWarning("Course with id: {id} not found", id);
             return new ResponseData<CourseResponseDto>
             {
                 Succeeded = false,
-                Message = $"Course with id {id} not found",
-                Data = null
+                Message = $"Course with id {id} not found"
             };
         }
 
         var response = course.ToCourseResponse();
+        
+        _logger.LogInformation("Course with id: {id} retrieved successfully", id);
         return new ResponseData<CourseResponseDto>
         {
             Succeeded = true,
@@ -143,6 +153,7 @@ public class CourseService : ICourseService
             .Select(c => c.ToCourseResponse())
             .ToListAsync(cancellationToken);
 
+        _logger.LogInformation("Course retrieved successfully");
         return new PaginatedResponse<CourseResponseDto>()
         {
             Succeeded = true,
