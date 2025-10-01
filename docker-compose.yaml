@@ -31,6 +31,8 @@ services:
       - SA_PASSWORD=${SA_PASSWORD}
       - MSSQL_PID=${MSSQL_PID}
       - TZ=Asia/Ho_Chi_Minh
+    ports:
+      - "1433:1433"
     volumes:
       - sqlserverdata:/var/opt/mssql
     healthcheck:
