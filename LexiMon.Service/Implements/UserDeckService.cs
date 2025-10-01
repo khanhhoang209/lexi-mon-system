@@ -39,10 +39,10 @@ public class UserDeckService : IUserDeckService
                 .AsNoTracking();
         
             if (!string.IsNullOrEmpty(request.CourseTitle))
-                query = query.Where(ud => ud.Course.Title.Contains(request.CourseTitle));
+                query = query.Where(ud => ud.Course!.Title.Contains(request.CourseTitle));
         
             if(!string.IsNullOrEmpty(request.CustomLessonTitle))
-                query = query.Where(ud => ud.CustomLesson.Title.Contains(request.CustomLessonTitle));
+                query = query.Where(ud => ud.CustomLesson!.Title.Contains(request.CustomLessonTitle));
         
             var totalCourses = query.Count();
             var userDeckResponse = await query
@@ -104,4 +104,83 @@ public class UserDeckService : IUserDeckService
             Data = userDeck
         };
     }
+
+    public async Task<ResponseData<Guid>> CreateUserDeckAsync(
+        UserDeckDto request, string userId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return new ResponseData<Guid>()
+                {
+                    Succeeded = false,
+                    Message = "User not found!"
+                };
+            }
+
+            var courseRepo = _unitOfWork.GetRepository<Course, Guid>();
+            var courseId = request.CourseId ?? Guid.Empty;
+            if (courseId != Guid.Empty)
+            {
+                var course = await courseRepo.GetByIdAsync(courseId, cancellationToken);
+                if (course == null)
+                {
+                    return new ResponseData<Guid>()
+                    {
+                        Succeeded = false,
+                        Message = "Course not found!"
+                    };
+                }
+            }
+
+            var customerLessonRepo = _unitOfWork.GetRepository<CustomLesson, Guid>();
+            var customLessonId = request.CustomLessonId ?? Guid.Empty;
+            if (customLessonId != Guid.Empty)
+            {
+                var customLesson = await customerLessonRepo.GetByIdAsync(customLessonId, cancellationToken);
+                if (customLesson == null)
+                {
+                    return new ResponseData<Guid>()
+                    {
+                        Succeeded = false,
+                        Message = "Custom lesson not found!"
+                    };
+                }
+            }
+
+            var userDeckRepo = _unitOfWork.GetRepository<UserDeck, Guid>();
+            var userDeck = new UserDeck()
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                CourseId = courseId,
+                CustomLessonId = customLessonId,
+                CreatedAt = DateTimeOffset.Now
+            };
+
+            await userDeckRepo.AddAsync(userDeck, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return new ResponseData<Guid>()
+            {
+                Succeeded = true,
+                Message = "User deck created successfully!",
+                Data = userDeck.Id
+            };
+
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e.Message);
+            return new ResponseData<Guid>()
+            {
+                Succeeded = false,
+                Message = "Fail to get user deck!! Error: " + e.Message
+            };
+        }
+    }
+
+
 }
