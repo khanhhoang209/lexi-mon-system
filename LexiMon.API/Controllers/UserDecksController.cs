@@ -46,5 +46,20 @@ public class UserDecksController : ControllerBase
 
         return Ok(serviceResponse);
     }
-    
+    [HttpPost]
+    [Authorize] 
+    public async Task<IActionResult> CreateUserDeckAsync(
+        [FromBody] UserDeckDto request,
+        CancellationToken cancellationToken = default)
+    {
+        var userId= User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new Exception("User not found");;
+        var serviceResponse = await _userDeckService.CreateUserDeckAsync(request, userId, cancellationToken);
+        if (!serviceResponse.Succeeded)
+        {
+            return BadRequest(serviceResponse);
+        }
+
+        return Created($"/api/user-decks/{serviceResponse.Data}", serviceResponse);
+    }
+
 }

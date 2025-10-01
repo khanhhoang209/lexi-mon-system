@@ -34,6 +34,7 @@ public class CustomLessonsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize]
     public async Task<IActionResult> UpdateAsync(
         [FromRoute] Guid id,
         [FromBody] CustomLessonRequestDto request,
@@ -49,6 +50,7 @@ public class CustomLessonsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize]
     public async Task<IActionResult> DeleteAsync([FromRoute] Guid id, CancellationToken cancellationToken = default)
     {
         var serviceResponse = await _service.DeleteCustomLessonAsync(id, cancellationToken);
@@ -61,6 +63,7 @@ public class CustomLessonsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [Authorize]
     public async Task<IActionResult> GetByIdAsync([FromRoute] Guid id, CancellationToken cancellationToken = default)
     {
         var serviceResponse = await _service.GetCustomLessonByIdAsync(id, cancellationToken);
@@ -73,6 +76,7 @@ public class CustomLessonsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var userId= User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new Exception("User not found");
@@ -85,6 +89,7 @@ public class CustomLessonsController : ControllerBase
     }
 
     [HttpGet("{customLessonId}/questions")]
+    [Authorize]
     public async Task<IActionResult> GetQuestionsByCustomLessonIdAsync(
         [FromRoute] Guid customLessonId,
         [FromQuery] GetQuestionRequest request,
