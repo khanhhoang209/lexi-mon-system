@@ -1,4 +1,5 @@
 using System.Text;
+using Azure.Storage.Blobs;
 using LexiMon.API.Infrastructure;
 using LexiMon.Repository.Context;
 using LexiMon.Repository.Domains;
@@ -22,7 +23,13 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
-
+        builder.Services.AddSingleton(sp =>
+        {
+            var cfg = sp.GetRequiredService<IConfiguration>();
+            var connStr = cfg["Azure:BlobStorageSettings:ConnectionString"]
+                          ?? throw new ArgumentException("Missing Azure Blob connection string");
+            return new BlobServiceClient(connStr);
+        });
         // Add custom exception handling middleware
         builder.Services.AddProblemDetails();
         builder.Services.AddExceptionHandler<CustomExceptionHandler>();
@@ -43,7 +50,12 @@ public class Program
         builder.Services.AddScoped<IQuestionService, QuestionService>();
         builder.Services.AddScoped<ICourseService, CourseService>();
         builder.Services.AddScoped<ILessonService, LessonService>();
-
+        builder.Services.AddScoped<IAzureBlobService, AzureBlobService>();
+        builder.Services.AddScoped<IAnimationTypeService, AnimationTypeService>();
+        builder.Services.AddScoped<IAnimationService, AnimationService>();
+        
+        
+        
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

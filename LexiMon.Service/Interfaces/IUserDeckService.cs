@@ -16,5 +16,10 @@ public interface IUserDeckService
         Guid userDeckId,
         CancellationToken cancellationToken = default);
     
-    
+    Task<ResponseData<Guid>> CreateUserDeckAsync(
+        UserDeckDto userDeckDto,
+        string userId,
+        CancellationToken cancellationToken = default);
+
+
 }
