@@ -147,7 +147,7 @@ public class CourseService : ICourseService
         
         var totalCourses = query.Count();
         var coursesResponse = await query
-            .OrderBy(c => c.CreatedAt)
+            .OrderByDescending(c => c.CreatedAt)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(c => c.ToCourseResponse())

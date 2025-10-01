@@ -158,7 +158,7 @@ public class QuestionService : IQuestionService
             _logger.LogInformation("Update successfully!");
             return new ServiceResponse { Succeeded = true, Message = "Question and answers updated successfully!" };
         }
-        catch (DbUpdateConcurrencyException ex)
+        catch
         {
             // Phòng khi chính bản thân Question vừa bị xóa/sửa ở nơi khác
             return new ServiceResponse { Succeeded = false, Message = "Conflict: question was modified/deleted. Reload and try again." };
@@ -309,8 +309,7 @@ public class QuestionService : IQuestionService
             return new PaginatedResponse<QuestionCustomLessonResponseDto>()
             {
                 Succeeded = false,
-                Message = "Custom lesson not found!",
-                Data = null
+                Message = "Custom lesson not found!"
             };
         }
         

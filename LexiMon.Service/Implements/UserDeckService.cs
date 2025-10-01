@@ -39,10 +39,10 @@ public class UserDeckService : IUserDeckService
                 .AsNoTracking();
         
             if (!string.IsNullOrEmpty(request.CourseTitle))
-                query = query.Where(ud => ud.Course.Title.Contains(request.CourseTitle));
+                query = query.Where(ud => ud.Course!.Title.Contains(request.CourseTitle));
         
             if(!string.IsNullOrEmpty(request.CustomLessonTitle))
-                query = query.Where(ud => ud.CustomLesson.Title.Contains(request.CustomLessonTitle));
+                query = query.Where(ud => ud.CustomLesson!.Title.Contains(request.CustomLessonTitle));
         
             var totalCourses = query.Count();
             var userDeckResponse = await query
@@ -104,4 +104,60 @@ public class UserDeckService : IUserDeckService
             Data = userDeck
         };
     }
+
+   public async Task<ResponseData<Guid>> CreateUserDeckAsync(
+    UserDeckDto request, string userId, CancellationToken cancellationToken = default)
+{
+    try
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            return new ResponseData<Guid> { Succeeded = false, Message = "User not found!" };
+
+        // Validate CourseId nếu có
+        Guid? courseId = request.CourseId;
+        if (courseId.HasValue)
+        {
+            var courseRepo = _unitOfWork.GetRepository<Course, Guid>();
+            if (await courseRepo.GetByIdAsync(courseId.Value, cancellationToken) is null)
+                return new ResponseData<Guid> { Succeeded = false, Message = "Course not found!" };
+        }
+
+        // Validate CustomLessonId nếu có
+        Guid? customLessonId = request.CustomLessonId;
+        if (customLessonId.HasValue)
+        {
+            var customLessonRepo = _unitOfWork.GetRepository<CustomLesson, Guid>();
+            if (await customLessonRepo.GetByIdAsync(customLessonId.Value, cancellationToken) is null)
+                return new ResponseData<Guid> { Succeeded = false, Message = "Custom lesson not found!" };
+        }
+
+        var userDeckRepo = _unitOfWork.GetRepository<UserDeck, Guid>();
+        var userDeck = new UserDeck
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            CourseId = courseId,                 // để nguyên null nếu không có
+            CustomLessonId = customLessonId,     // để nguyên null nếu không có
+            CreatedAt = DateTimeOffset.Now,
+            Status = true                        // nếu bạn dùng Status
+        };
+
+        await userDeckRepo.AddAsync(userDeck, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return new ResponseData<Guid>
+        {
+            Succeeded = true,
+            Message = "User deck created successfully!",
+            Data = userDeck.Id
+        };
+    }
+    catch (Exception e)
+    {
+        _logger.LogError(e, "CreateUserDeckAsync failed");
+        return new ResponseData<Guid> { Succeeded = false, Message = "Fail to create user deck. Error: " + e.Message };
+    }
+}
+
 }
