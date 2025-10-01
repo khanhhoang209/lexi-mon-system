@@ -26,10 +26,14 @@ public class QuestionService : IQuestionService
         CancellationToken ct = default)
     {
         try
-        { 
-            if (requests is null || requests.Count == 0) 
+        {
+            if (requests is null || requests.Count == 0)
+            {
+                _logger.LogWarning("Emty request!!");
                 return new ResponseData<List<Guid>> { Succeeded = false, Message = "Empty request." };
-            
+                            
+            }
+         
             var questionRepo = _unitOfWork.GetRepository<Question, Guid>(); 
             var lessonRepo = _unitOfWork.GetRepository<Lesson, Guid>();
             var customLessonRepo = _unitOfWork.GetRepository<CustomLesson, Guid>();
@@ -45,15 +49,23 @@ public class QuestionService : IQuestionService
             if (lessonId is not null)
             {
                 if (await lessonRepo.GetByIdAsync(lessonId.Value, ct) is null)
-                    return new ResponseData<List<Guid>> { Succeeded = false, Message = $"Lesson with id {lessonId} not found!" };
+                {
+                    _logger.LogWarning($"Lesson with id {lessonId} not found!");
+                    return new  ResponseData<List<Guid>> { Succeeded = false, Message = $"Lesson with id {lessonId} not found!" };
+                                
+                }
             }
             else if (customLessonId is not null)
             {
-             if (await customLessonRepo.GetByIdAsync(customLessonId.Value, ct) is null)
-                return new ResponseData<List<Guid>> { Succeeded = false, Message = $"Custom lesson with id {customLessonId} not found!" };
+                if (await customLessonRepo.GetByIdAsync(customLessonId.Value, ct) is null)
+                {
+                    _logger.LogWarning( $"Custom lesson with id {customLessonId} not found!");
+                    return new ResponseData<List<Guid>> { Succeeded = false, Message = $"Custom lesson with id {customLessonId} not found!" };
+                }
             }
             else
             {
+                _logger.LogWarning( $"Either LessonId or CustomLessonId must be provided!");
                 return new ResponseData<List<Guid>> {
                     Succeeded = false,
                     Message = "Either LessonId or CustomLessonId must be provided!"
@@ -84,6 +96,7 @@ public class QuestionService : IQuestionService
             await questionRepo.AddRangeAsync(toAdd, ct);
             await _unitOfWork.SaveChangesAsync(ct);
 
+            _logger.LogInformation("Questions created successfully");
             return new ResponseData<List<Guid>>
             { 
                 Succeeded = true, 
@@ -93,6 +106,7 @@ public class QuestionService : IQuestionService
         }
         catch (Exception ex)
         {
+            _logger.LogError($"Failed to create question and answers: {ex.Message}");
             return new ResponseData<List<Guid>>()
             {
                 Succeeded = false,
@@ -110,7 +124,11 @@ public class QuestionService : IQuestionService
         
         var question = await qRepo.GetByIdAsync(id, ct);
         if (question is null)
+        {
+            _logger.LogWarning($"Question with id {id} not found!");
             return new ServiceResponse { Succeeded = false, Message = "Question not found!" };
+        }
+            
 
         var now = DateTimeOffset.UtcNow;
         question.Content   = req.Content.Trim();
@@ -137,9 +155,10 @@ public class QuestionService : IQuestionService
         try
         {
             await _unitOfWork.SaveChangesAsync(ct);
+            _logger.LogInformation("Update successfully!");
             return new ServiceResponse { Succeeded = true, Message = "Question and answers updated successfully!" };
         }
-        catch (DbUpdateConcurrencyException ex)
+        catch
         {
             // Phòng khi chính bản thân Question vừa bị xóa/sửa ở nơi khác
             return new ServiceResponse { Succeeded = false, Message = "Conflict: question was modified/deleted. Reload and try again." };
@@ -151,14 +170,19 @@ public class QuestionService : IQuestionService
         var questionRepo = _unitOfWork.GetRepository<Question, Guid>();
         var question = await questionRepo.GetByIdAsync(id, cancellationToken);
         if (question is null)
+        {
+            _logger.LogWarning($"Question with id {id} not found!");
             return new ServiceResponse
-            {
-                Succeeded = false,
+            { 
+                Succeeded = false, 
                 Message = "Question not found!"
             };
+        }
+          
         
         await questionRepo.RemoveAsync(question, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Questions deleted successfully!");
         return new ServiceResponse
         {
             Succeeded = true,
@@ -192,12 +216,17 @@ public class QuestionService : IQuestionService
             .FirstOrDefaultAsync(q => q.QuestionId == id, cancellationToken);
 
         if (dto is null)
+        {
+            _logger.LogWarning("Question not found");
             return new ResponseData<QuestionResponseDto>()
             {
                 Succeeded = false,
                 Message = "Question not found!"
             };
+        }
+          
 
+        _logger.LogInformation("Questions retrieved successfully!");
         return new ResponseData<QuestionResponseDto>()
         {
             Succeeded = true,
@@ -215,11 +244,11 @@ public class QuestionService : IQuestionService
         var lesson = await lessonRepo.GetByIdAsync(lessonId, cancellationToken);
         if (lesson == null)
         {
+            _logger.LogWarning("Lesson not found");
             return new PaginatedResponse<QuestionLessonResponseDto>()
             {
                 Succeeded = false,
-                Message = "Lesson not found!",
-                Data = null
+                Message = "Lesson not found!"
             };
         }
         
@@ -253,6 +282,7 @@ public class QuestionService : IQuestionService
             })
             .ToListAsync(cancellationToken);
 
+        _logger.LogInformation("Questions retrieved successfully!");
         return new PaginatedResponse<QuestionLessonResponseDto>()
         {
             Succeeded = true,
@@ -275,11 +305,11 @@ public class QuestionService : IQuestionService
         var customLesson = await customLessonRepo.GetByIdAsync(customLessonId, cancellationToken);
         if (customLesson == null)
         {
+            _logger.LogWarning("Custom lesson not found");
             return new PaginatedResponse<QuestionCustomLessonResponseDto>()
             {
                 Succeeded = false,
-                Message = "Custom lesson not found!",
-                Data = null
+                Message = "Custom lesson not found!"
             };
         }
         
@@ -314,6 +344,7 @@ public class QuestionService : IQuestionService
             })
             .ToListAsync(cancellationToken);
         
+        _logger.LogInformation("Questions retrieved successfully!");
         return new PaginatedResponse<QuestionCustomLessonResponseDto>()
         {
             Succeeded = true,
