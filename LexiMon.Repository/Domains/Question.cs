@@ -6,6 +6,8 @@ public class Question : BaseAuditableEntity<Guid>
 {
     public string Content { get; set; } = null!;
     public Guid? LessonId { get; set; }
+    
+    public bool IsStudied {get; set; }
     public Lesson? Lesson { get; set; }
     public Guid? CustomLessonId { get; set; }
     public CustomLesson? CustomLesson { get; set; }

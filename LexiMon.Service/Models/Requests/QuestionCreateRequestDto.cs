@@ -17,6 +17,7 @@ public class QuestionUpdateRequestDto
 {
     [Required(ErrorMessage = "Vui lòng nhập nội dung câu hỏi!")]
     public string Content { get; set; } = null!;
+    public bool IsStudied {get; set; }
 
     public List<AnswerUpsertDto> Answers { get; set; } = new();
 }
