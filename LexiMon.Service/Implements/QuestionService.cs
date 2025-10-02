@@ -79,6 +79,7 @@ public class QuestionService : IQuestionService
                 Content = r.Content.Trim(),
                 LessonId = lessonId,
                 CustomLessonId = customLessonId,
+                IsStudied = false,
                 CreatedAt = now,
                 Answers = r.Answers.Select(a => new Answer
                 {
@@ -132,6 +133,7 @@ public class QuestionService : IQuestionService
 
         var now = DateTimeOffset.UtcNow;
         question.Content   = req.Content.Trim();
+        question.IsStudied = req.IsStudied;
         question.UpdatedAt = now;
 
         // XÓA  mọi Answer thuộc question TRỰC TIẾP TRÊN DB
@@ -206,6 +208,7 @@ public class QuestionService : IQuestionService
                 CustomLessonId = q.CustomLessonId,
                 CustomLessonTitle = q.CustomLesson != null ? q.CustomLesson.Title : null,
                 IsActive = q.Status,
+                IsStudied = q.IsStudied,
                 Answers = q.Answers.Select(a => new AnswerResponseDto
                 {
                     AnswerId = a.Id,
@@ -273,6 +276,7 @@ public class QuestionService : IQuestionService
                 LessonId = q.LessonId,
                 LessonTitle = q.Lesson != null ? q.Lesson.Title : null,
                 IsActive = q.Status,
+                IsStudied = q.IsStudied,
                 Answers = q.Answers.Select(a => new AnswerResponseDto
                 {
                     AnswerId = a.Id,
@@ -335,6 +339,7 @@ public class QuestionService : IQuestionService
                 CustomLessonId = q.CustomLessonId,
                 CustomLessonTitle = q.CustomLesson != null ? q.CustomLesson.Title : null,
                 IsActive = q.Status,
+                IsStudied = q.IsStudied,
                 Answers = q.Answers.Select(a => new AnswerResponseDto
                 {
                     AnswerId = a.Id,

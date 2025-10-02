@@ -11,6 +11,7 @@ public class QuestionResponseDto
     public Guid? CustomLessonId { get; set; }
     public string? CustomLessonTitle { get; set; } = null!;
     public bool IsActive { get; set; }
+    public bool IsStudied {get; set; }
     public List<AnswerResponseDto> Answers { get; set; } = new();
 }
 
@@ -23,6 +24,7 @@ public class QuestionCustomLessonResponseDto
     public Guid? CustomLessonId { get; set; }
     public string? CustomLessonTitle { get; set; } = null!;
     public bool IsActive { get; set; }
+    public bool IsStudied {get; set; }
     public List<AnswerResponseDto> Answers { get; set; } = new();
 }
 
@@ -33,6 +35,7 @@ public class QuestionLessonResponseDto
     public Guid? LessonId { get; set; }
     public string? LessonTitle { get; set; } = null!;
     public bool IsActive { get; set; }
+    public bool IsStudied {get; set; }
     public List<AnswerResponseDto> Answers { get; set; } = new();
 }
 
