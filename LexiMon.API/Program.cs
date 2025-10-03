@@ -53,9 +53,9 @@ public class Program
         builder.Services.AddScoped<IAzureBlobService, AzureBlobService>();
         builder.Services.AddScoped<IAnimationTypeService, AnimationTypeService>();
         builder.Services.AddScoped<IAnimationService, AnimationService>();
-        
-        
-        
+
+
+
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -165,10 +165,11 @@ public class Program
         // {
         // }
 
-        app.UseExceptionHandler();
         app.UseRouting();
 
         app.UseCors("AllowAll");
+
+        app.UseExceptionHandler();
 
         using (var scope = app.Services.CreateScope())
         {
