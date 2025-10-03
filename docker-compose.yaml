@@ -12,6 +12,8 @@ services:
       - ./nginx/certs:/etc/nginx/certs
       - ./nginx/vhost.d:/etc/nginx/vhost.d
       - ./nginx/html:/usr/share/nginx/html
+    labels:
+      - com.github.nginx-proxy.nginx=true
     restart: unless-stopped
     networks:
       - leximon-network
@@ -21,6 +23,7 @@ services:
     container_name: nginx-proxy-acme
     environment:
       - DEFAULT_EMAIL=${DEFAULT_EMAIL}
+      - NGINX_PROXY_CONTAINER=nginx-proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./nginx/certs:/etc/nginx/certs
