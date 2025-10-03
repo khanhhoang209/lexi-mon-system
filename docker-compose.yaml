@@ -1,6 +1,40 @@
 ﻿version: "3.9"
 
 services:
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:1.8.0
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./nginx/certs:/etc/nginx/certs
+      - ./nginx/vhost.d:/etc/nginx/vhost.d
+      - ./nginx/html:/usr/share/nginx/html
+    labels:
+      - com.github.nginx-proxy.nginx=true
+    restart: unless-stopped
+    networks:
+      - leximon-network
+
+  nginx-proxy-acme:
+    image: nginxproxy/acme-companion:2.6.0
+    container_name: nginx-proxy-acme
+    environment:
+      - DEFAULT_EMAIL=${DEFAULT_EMAIL}
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./nginx/certs:/etc/nginx/certs
+      - ./nginx/vhost.d:/etc/nginx/vhost.d
+      - ./nginx/html:/usr/share/nginx/html
+    depends_on:
+      - nginx-proxy
+    restart: unless-stopped
+    networks:
+      - leximon-network
+
   leximon-api:
     image: leximon.api
     container_name: leximon-api
@@ -9,11 +43,13 @@ services:
       dockerfile: LexiMon.API/Dockerfile
     env_file:
       - .env
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     environment:
       - ASPNETCORE_URLS=${ASPNETCORE_URLS}
       - TZ=Asia/Ho_Chi_Minh
+      - VIRTUAL_HOST=${VIRTUAL_HOST}
+      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
     depends_on:
       leximon-db:
         condition: service_healthy
