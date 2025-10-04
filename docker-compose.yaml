@@ -24,6 +24,7 @@ services:
     environment:
       - DEFAULT_EMAIL=${DEFAULT_EMAIL}
       - NGINX_PROXY_CONTAINER=nginx-proxy
+      - ACME_CA_URI=https://acme-staging-v02.api.letsencrypt.org/directory
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./nginx/certs:/etc/nginx/certs
@@ -50,6 +51,7 @@ services:
       - TZ=Asia/Ho_Chi_Minh
       - VIRTUAL_HOST=${VIRTUAL_HOST}
       - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
+      - VIRTUAL_PORT=8080
     depends_on:
       leximon-db:
         condition: service_healthy
