@@ -1,19 +1,15 @@
-﻿using LexiMon.Repository.Common;
+﻿using LexiMon.Repository.Domains;
 using LexiMon.Repository.Enum;
 
-namespace LexiMon.Repository.Domains;
+namespace LexiMon.Service.Models.Requests;
 
-public class LessonProgress : BaseAuditableEntity<Guid>
+public class LessonProgressRequestDto
 {
-    public string UserId { get; set; } = null!;
-    public ApplicationUser User { get; set; } = null!;
     public int TargetValue { get; set; }
     public int CurrentValue { get; set; }
     public LessonProgressStatus LessonProgressStatus {get; set;}
     public DateTimeOffset? StartDate { get; set; }
     public DateTimeOffset? EndDate { get; set; }
     public Guid? LessonId { get; set; }
-    public Lesson? Lesson { get; set; }
     public Guid? CustomLessonId { get; set; }
-    public CustomLesson? CustomLesson { get; set; }
 }
