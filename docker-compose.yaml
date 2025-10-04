@@ -13,7 +13,7 @@ services:
       - ./nginx/vhost.d:/etc/nginx/vhost.d
       - ./nginx/html:/usr/share/nginx/html
     labels:
-      - com.github.nginx-proxy.nginx=true
+      - com.github.nginx-proxy.nginx=false
     restart: unless-stopped
     networks:
       - leximon-network
