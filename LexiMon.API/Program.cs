@@ -56,9 +56,10 @@ public class Program
         builder.Services.AddScoped<IAzureBlobService, AzureBlobService>();
         builder.Services.AddScoped<IAnimationTypeService, AnimationTypeService>();
         builder.Services.AddScoped<IAnimationService, AnimationService>();
-
-
-
+        builder.Services.AddScoped<ILessonProgressService, LessonProgressService>();
+        builder.Services.AddScoped<ICategoryService, CategoryService>();
+        
+        
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -192,7 +193,7 @@ public class Program
         
         app.UseSwagger();
         app.UseSwaggerUI();
-        
+
         // app.UseHttpsRedirection();
 
         app.UseAuthentication();
