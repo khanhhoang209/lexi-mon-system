@@ -166,9 +166,9 @@ public class Program
         builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-            options.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("172.18.0.0"), 16));
             options.KnownNetworks.Clear();
             options.KnownProxies.Clear();
+            options.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("172.18.0.0"), 16));
         });
 
         var app = builder.Build();
@@ -190,7 +190,7 @@ public class Program
             var db = scope.ServiceProvider.GetRequiredService<LexiMonDbContext>();
             db.Database.Migrate();
         }
-        
+
         app.UseSwagger();
         app.UseSwaggerUI();
 
