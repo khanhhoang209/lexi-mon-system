@@ -17,7 +17,8 @@ public static class CourseMapper
             Price = course.Price,
             Coin = course.Coin,
             CreatedAt = course.CreatedAt,
-            UpdatedAt = course.UpdatedAt
+            UpdatedAt = course.UpdatedAt,
+            IsActive = course.Status
         };
     }
 

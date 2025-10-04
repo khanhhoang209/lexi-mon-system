@@ -1,5 +1,7 @@
-﻿using LexiMon.Service.Interfaces;
+﻿using System.Security.Claims;
+using LexiMon.Service.Interfaces;
 using LexiMon.Service.Models.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LexiMon.API.Controllers;
@@ -11,11 +13,13 @@ public class LessonsController : ControllerBase
 
     private readonly ILessonService _service;
     private readonly IQuestionService _questionService;
+    private readonly ILessonProgressService _lessonProgressService;
 
-    public LessonsController(ILessonService service, IQuestionService questionService)
+    public LessonsController(ILessonService service, IQuestionService questionService, ILessonProgressService lessonProgressService)
     {
         _service = service;
         _questionService = questionService;
+        _lessonProgressService = lessonProgressService;
     }
 
     [HttpPost]
@@ -82,5 +86,21 @@ public class LessonsController : ControllerBase
         
         return Ok(serviceResponse);
     }
+    [HttpGet("{lessonId:guid}/lesson-progress")]
+    [Authorize]
+    public async Task<IActionResult> GetLessonProgress(
+        [FromRoute] Guid lessonId,
+        [FromQuery] GetLessonProgressByLessonIdRequest request, 
+        CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? throw new Exception("User not found");
 
+        var result = await _lessonProgressService
+            .GetLessonProgressByLessonIdAsync(userId, lessonId, request, cancellationToken);
+        if (!result.Succeeded)
+            return BadRequest(result);
+
+        return Ok(result);
+    }
 }

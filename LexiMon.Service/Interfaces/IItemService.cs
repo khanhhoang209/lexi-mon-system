@@ -4,26 +4,26 @@ using LexiMon.Service.Models.Responses;
 
 namespace LexiMon.Service.Interfaces;
 
-public interface IAnimationService
+public interface IItemService
 {
-    Task<ResponseData<Guid>> CreateAnimationAsync(
-        AnimationRequestDto request,
+    Task<ResponseData<Guid>> CreateItemAsync(
+        ItemRequestDto request,
         CancellationToken cancellationToken = default);
     
-    Task<ServiceResponse> UpdateAnimationAsync(
+    Task<ServiceResponse> UpdateItemAsync(
         Guid id,
-        AnimationRequestDto request,
+        ItemRequestDto request,
         CancellationToken cancellationToken = default);
     
-    Task<ServiceResponse> DeleteAnimationAsync(
-        Guid id,
-        CancellationToken cancellationToken = default);
-    
-    Task<ResponseData<AnimationResponseDto>> GetAnimationByIdAsync(
+    Task<ServiceResponse> DeleteItemAsync(
         Guid id,
         CancellationToken cancellationToken = default);
     
-    Task<PaginatedResponse<AnimationResponseDto>> GetAnimationsAsync(
-        GetAnimationRequest request,
+    Task<ResponseData<ItemResponseDto>> GetItemByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default);
+    
+    Task<PaginatedResponse<ItemResponseDto>> GetItemsAsync(
+        GetItemRequest request,
         CancellationToken cancellationToken = default);
 }

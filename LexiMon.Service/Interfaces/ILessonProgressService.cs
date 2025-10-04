@@ -28,4 +28,14 @@ public interface ILessonProgressService
     Task<ServiceResponse> DeleteLessonProgressAsync(
         Guid id,
         CancellationToken cancellationToken = default);
+    Task<PaginatedResponse<LessonProgressResponseDto>> GetLessonProgressByLessonIdAsync(
+        string userId,
+        Guid lessonId,
+        GetLessonProgressByLessonIdRequest request,
+        CancellationToken cancellationToken = default);
+    Task<PaginatedResponse<LessonProgressResponseDto>> GetLessonProgressByCustomLessonAsync(
+        string userId,
+        Guid customLessonId,
+        GetLessonProgressByLessonIdRequest request,
+        CancellationToken cancellationToken = default);
 }

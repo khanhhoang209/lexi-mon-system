@@ -56,7 +56,7 @@ public class Program
         builder.Services.AddScoped<IAnimationService, AnimationService>();
         builder.Services.AddScoped<ILessonProgressService, LessonProgressService>();
         builder.Services.AddScoped<ICategoryService, CategoryService>();
-        
+        builder.Services.AddScoped<IItemService, ItemService>();
         
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
