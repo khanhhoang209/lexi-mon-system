@@ -6,11 +6,11 @@ namespace LexiMon.API.Controllers;
 
 [ApiController]
 [Route("api/animation-types")]
-public class AnimationTypeController : ControllerBase
+public class AnimationTypesController : ControllerBase
 {
     private readonly IAnimationTypeService _service;
 
-    public AnimationTypeController(IAnimationTypeService service)
+    public AnimationTypesController(IAnimationTypeService service)
     {
         _service = service;
     }

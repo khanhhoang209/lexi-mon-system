@@ -18,7 +18,7 @@ public class CoursesController : ControllerBase
         _service = service;
         _lessonService = lessonService;
         _blob = blob;
-        _defaultContainer = configuration["Azure:BlobStorageSettings:DefaultContainer"] ?? "images";;
+        _defaultContainer = configuration["Azure:BlobStorageSettings:DefaultContainer"] ?? "images";
     }
 
     [HttpPost]

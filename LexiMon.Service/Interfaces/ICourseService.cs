@@ -7,12 +7,12 @@ namespace LexiMon.Service.Interfaces;
 public interface ICourseService
 {
     Task<ResponseData<Guid>> CreateCourseAsync(
-        CourseRequestDto requestDto,
+        CourseRequestDto request,
         CancellationToken cancellationToken = default);
     
     Task<ServiceResponse> UpdateCourseAsync(
         Guid id,
-        CourseRequestDto requestDto,
+        CourseRequestDto request,
         CancellationToken cancellationToken = default);
     
     Task<ServiceResponse> DeleteCourseAsync(

@@ -12,13 +12,15 @@ public class CustomLessonsController : ControllerBase
 {
     private readonly ICustomLessonService _service;
     private readonly IQuestionService _questionService;
+    private readonly ILessonProgressService _lessonProgressService;
 
-    public CustomLessonsController(ICustomLessonService service, IQuestionService questionService)
+    public CustomLessonsController(ICustomLessonService service, IQuestionService questionService, ILessonProgressService lessonProgressService)
     {
         _service = service;
         _questionService = questionService;
+        _lessonProgressService = lessonProgressService;
     }
-    
+
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> CreateAsync(
@@ -101,5 +103,21 @@ public class CustomLessonsController : ControllerBase
         
         return Ok(serviceResponse);
     }
+    [HttpGet("{customLessonId}/lesson-progress")]
+    [Authorize]
+    public async Task<IActionResult> GetLessonProgress(
+        [FromRoute] Guid customLessonId,
+        [FromQuery] GetLessonProgressByLessonIdRequest request, 
+        CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? throw new Exception("User not found");
 
+        var result = await _lessonProgressService
+            .GetLessonProgressByCustomLessonAsync(userId, customLessonId, request, cancellationToken);
+        if (!result.Succeeded)
+            return BadRequest(result);
+
+        return Ok(result);
+    }
 }
