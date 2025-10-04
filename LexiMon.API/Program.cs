@@ -58,8 +58,8 @@ public class Program
         builder.Services.AddScoped<IAnimationService, AnimationService>();
         builder.Services.AddScoped<ILessonProgressService, LessonProgressService>();
         builder.Services.AddScoped<ICategoryService, CategoryService>();
-        
-        
+
+
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -166,9 +166,6 @@ public class Program
         builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-            options.KnownNetworks.Clear();
-            options.KnownProxies.Clear();
-            options.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("172.18.0.0"), 16));
         });
 
         var app = builder.Build();
