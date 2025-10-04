@@ -192,4 +192,120 @@ public class LessonProgressService : ILessonProgressService
             Message = "Delete Lesson Progress Success!"
         };
     }
+
+    public async Task<PaginatedResponse<LessonProgressResponseDto>> GetLessonProgressByLessonIdAsync(
+        string userId, 
+        Guid lessonId, 
+        GetLessonProgressByLessonIdRequest request,
+        CancellationToken cancellationToken = default)
+    {
+     var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            _logger.LogWarning("User not found!");
+            return new PaginatedResponse<LessonProgressResponseDto>
+                { 
+                    Succeeded = false, 
+                    Message = "User not found!" 
+                };
+        }
+        
+        var repo = _unitOfWork.GetRepository<LessonProgress, Guid>();
+        var query = repo.Query()
+            .Include(lp => lp.Lesson)
+            .ThenInclude(l => l!.Course)
+            .Include(lp => lp.CustomLesson)
+            .Where(lp => lp.UserId == userId && lp.LessonId == lessonId);
+
+        if (request.LessonProgressStatus.HasValue)
+        {
+            query = query.Where(lp => lp.LessonProgressStatus == request.LessonProgressStatus);
+        }
+        if (request.TargetValue > 0)
+            query = query.Where(lp => lp.TargetValue == request.TargetValue);
+
+        if (request.CurrentValue > 0)
+            query = query.Where(lp => lp.CurrentValue == request.CurrentValue);
+
+        if (!string.IsNullOrWhiteSpace(request.Title))
+            query = query.Where(lp => lp.Lesson!.Title.Contains(request.Title));
+
+        var totalCount = query.Count();
+        
+        var response = await query
+            .OrderByDescending(lp => lp.CreatedAt)
+            .Skip((request.Page - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .Select(lp => lp.ToLessonProgressResponse())
+            .ToListAsync(cancellationToken);
+        
+        return new PaginatedResponse<LessonProgressResponseDto>()
+        {
+            Succeeded = true,
+            Message = "Lesson Progress retrieved successfully.",
+            TotalCount = totalCount,
+            PageNumber = request.Page,
+            PageSize = request.PageSize,
+            TotalPages = (int)Math.Ceiling((double)totalCount / request.PageSize),
+            Data = response
+        };
+    }
+
+    public async Task<PaginatedResponse<LessonProgressResponseDto>> GetLessonProgressByCustomLessonAsync(
+        string userId, 
+        Guid customLessonId,
+        GetLessonProgressByLessonIdRequest request, 
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            _logger.LogWarning("User not found!");
+            return new PaginatedResponse<LessonProgressResponseDto>
+            { 
+                Succeeded = false, 
+                Message = "User not found!" 
+            };
+        }
+        
+        var repo = _unitOfWork.GetRepository<LessonProgress, Guid>();
+        var query = repo.Query()
+            .Include(lp => lp.Lesson)
+            .ThenInclude(l => l!.Course)
+            .Include(lp => lp.CustomLesson)
+            .Where(lp => lp.UserId == userId && lp.CustomLessonId == customLessonId);
+
+        if (request.LessonProgressStatus.HasValue)
+        {
+            query = query.Where(lp => lp.LessonProgressStatus == request.LessonProgressStatus);
+        }
+        if (request.TargetValue > 0)
+            query = query.Where(lp => lp.TargetValue == request.TargetValue);
+
+        if (request.CurrentValue > 0)
+            query = query.Where(lp => lp.CurrentValue == request.CurrentValue);
+
+        if (!string.IsNullOrWhiteSpace(request.Title))
+            query = query.Where(lp => lp.CustomLesson!.Title.Contains(request.Title));
+
+        var totalCount = query.Count();
+        
+        var response = await query
+            .OrderByDescending(lp => lp.CreatedAt)
+            .Skip((request.Page - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .Select(lp => lp.ToLessonProgressResponse())
+            .ToListAsync(cancellationToken);
+        
+        return new PaginatedResponse<LessonProgressResponseDto>()
+        {
+            Succeeded = true,
+            Message = "Lesson Progress retrieved successfully.",
+            TotalCount = totalCount,
+            PageNumber = request.Page,
+            PageSize = request.PageSize,
+            TotalPages = (int)Math.Ceiling((double)totalCount / request.PageSize),
+            Data = response
+        };
+    }
 }
