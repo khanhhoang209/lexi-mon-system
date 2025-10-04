@@ -17,5 +17,9 @@ public class LessonProgressConfiguration : IEntityTypeConfiguration<LessonProgre
             .IsRequired(false);
         builder.Property(lp => lp.StartDate).IsRequired(false);
         builder.Property(lp => lp.EndDate).IsRequired(false);
+        builder.HasOne(lp => lp.User)
+            .WithMany()
+            .HasForeignKey(lp => lp.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
