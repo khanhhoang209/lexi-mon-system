@@ -718,3 +718,8 @@ FodyWeavers.xsd
 # Appsettings files
 **/appsettings*.json
 **/appsettings*.Development.json
+
+# Nginx
+nginx/certs/
+nginx/vhost.d/
+nginx/html/

@@ -9,6 +9,7 @@ using LexiMon.Repository.Interfaces;
 using LexiMon.Service.Implements;
 using LexiMon.Service.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -166,10 +167,11 @@ public class Program
         // {
         // }
 
-        app.UseExceptionHandler();
         app.UseRouting();
 
         app.UseCors("AllowAll");
+
+        app.UseExceptionHandler();
 
         using (var scope = app.Services.CreateScope())
         {
@@ -179,7 +181,12 @@ public class Program
         app.UseSwagger();
         app.UseSwaggerUI();
 
-        // app.UseHttpsRedirection();
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+        });
+
+        app.UseHttpsRedirection();
 
         app.UseAuthentication();
         app.UseAuthorization();
