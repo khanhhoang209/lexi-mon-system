@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text;
 using Azure.Storage.Blobs;
 using LexiMon.API.Infrastructure;
@@ -15,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using IPNetwork = Microsoft.AspNetCore.HttpOverrides.IPNetwork;
 
 namespace LexiMon.API;
 
@@ -160,12 +162,19 @@ public class Program
         builder.Logging.ClearProviders();
         builder.Logging.AddConsole();
 
+        // Configure forwarded headers for reverse proxy scenarios
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        });
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
         // if (app.Environment.IsDevelopment())
         // {
         // }
+        app.UseForwardedHeaders();
 
         app.UseRouting();
 
@@ -178,15 +187,11 @@ public class Program
             var db = scope.ServiceProvider.GetRequiredService<LexiMonDbContext>();
             db.Database.Migrate();
         }
+
         app.UseSwagger();
         app.UseSwaggerUI();
 
-        app.UseForwardedHeaders(new ForwardedHeadersOptions
-        {
-            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-        });
-
-        app.UseHttpsRedirection();
+        // app.UseHttpsRedirection();
 
         app.UseAuthentication();
         app.UseAuthorization();
