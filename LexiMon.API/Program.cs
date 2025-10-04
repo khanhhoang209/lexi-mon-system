@@ -159,6 +159,14 @@ public class Program
         builder.Logging.ClearProviders();
         builder.Logging.AddConsole();
 
+        // Configure forwarded headers for reverse proxy scenarios
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -180,12 +188,9 @@ public class Program
         app.UseSwagger();
         app.UseSwaggerUI();
 
-        app.UseForwardedHeaders(new ForwardedHeadersOptions
-        {
-            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-        });
+        app.UseForwardedHeaders();
 
-        app.UseHttpsRedirection();
+        // app.UseHttpsRedirection();
 
         app.UseAuthentication();
         app.UseAuthorization();
