@@ -56,7 +56,8 @@ public class Program
         builder.Services.AddScoped<IAzureBlobService, AzureBlobService>();
         builder.Services.AddScoped<IAnimationTypeService, AnimationTypeService>();
         builder.Services.AddScoped<IAnimationService, AnimationService>();
-
+        builder.Services.AddScoped<ILessonProgressService, LessonProgressService>();
+        builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 
         // Register repositories
@@ -165,9 +166,6 @@ public class Program
         builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-            options.KnownNetworks.Clear();
-            options.KnownProxies.Clear();
-            options.KnownNetworks.Add(new IPNetwork(IPAddress.Parse("172.18.0.0"), 16));
         });
 
         var app = builder.Build();

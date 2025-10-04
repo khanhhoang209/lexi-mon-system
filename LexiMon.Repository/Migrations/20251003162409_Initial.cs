@@ -591,8 +591,10 @@ namespace LexiMon.Repository.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     TargetValue = table.Column<int>(type: "int", nullable: false),
                     CurrentValue = table.Column<int>(type: "int", nullable: false),
+                    LessonProgressStatus = table.Column<int>(type: "int", nullable: false),
                     StartDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     EndDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -605,6 +607,12 @@ namespace LexiMon.Repository.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_LessonProgress", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LessonProgress_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_LessonProgress_CustomLesson_CustomLessonId",
                         column: x => x.CustomLessonId,
@@ -686,9 +694,9 @@ namespace LexiMon.Repository.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "Address", "BirthDate", "ConcurrencyStamp", "CreatedAt", "DeletedAt", "Email", "EmailConfirmed", "FirstName", "Gender", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "Status", "TwoFactorEnabled", "UpdatedAt", "UserName" },
                 values: new object[,]
                 {
-                    { "5d7efb6d-0d52-4159-ab2e-7fd356973925", 0, null, null, "01f98576-009a-4a47-988b-ba4b9e1f63bc", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com", true, null, 3, null, false, null, "FREE@EXAMPLE.COM", "FREE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEAZrgQy+kdhwCf58vDVg+kdjxWdQp6oVLVED0fDBdKSh1BCQfYO/nTTwBfaxL5XNvg==", null, false, "b834dabe-bd92-40ee-9ac8-06f13d9ed3df", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com" },
-                    { "88f1581b-4f4e-4831-8cf8-ee4afed04c11", 0, null, null, "91136ced-58d7-4992-ad51-1ede6d1a0184", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com", true, null, 3, null, false, null, "ADMIN@EXAMPLE.COM", "ADMIN@EXAMPLE.COM", "AQAAAAIAAYagAAAAEMbcygdX0FUsOAnZ8pjErZ9uBri0BK5ZFDEETU7YySreok2ZpEVqUB6/ULuRnbf7jw==", null, false, "514a6340-baad-4223-b10c-704f18bc1f23", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com" },
-                    { "c2765f80-383f-46f2-9a73-ec47863100ae", 0, null, null, "8999a420-e201-40c1-9d08-a8128921fa60", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com", true, null, 3, null, false, null, "PREMIUM@EXAMPLE.COM", "PREMIUM@EXAMPLE.COM", "AQAAAAIAAYagAAAAEJaX9NSGyxHj/CxHvXlL+4YQxR5jhEDALwN4TDsgfVXmmezbK3HsIO2+7sUboWdhdw==", null, false, "c170b444-52d6-4c88-a217-07b2df603fcc", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com" }
+                    { "5d7efb6d-0d52-4159-ab2e-7fd356973925", 0, null, null, "a455b6c2-eea0-4c23-a75f-16c17420ea1c", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com", true, null, 3, null, false, null, "FREE@EXAMPLE.COM", "FREE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEO14X3TFmvQxkueAdm8oMJmynut4423zaFnF16haOmQinu6A1aPFvDHR+geid6vs7w==", null, false, "b501dd88-2f58-4832-8910-9e598b076baa", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com" },
+                    { "88f1581b-4f4e-4831-8cf8-ee4afed04c11", 0, null, null, "d47817c6-a5fe-49df-a350-39e6441844ae", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com", true, null, 3, null, false, null, "ADMIN@EXAMPLE.COM", "ADMIN@EXAMPLE.COM", "AQAAAAIAAYagAAAAEMBeEyOJRLfaBNw34+/0g4HMWMrmiX0vxSIrXghD4YDw+RQpcRYKicpJCTCsPuQXXw==", null, false, "62b27bf9-c2e8-4adf-a34d-d9aea5fdd47b", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com" },
+                    { "c2765f80-383f-46f2-9a73-ec47863100ae", 0, null, null, "3a121f08-71a4-4b4d-b6d5-899de97fd6d5", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com", true, null, 3, null, false, null, "PREMIUM@EXAMPLE.COM", "PREMIUM@EXAMPLE.COM", "AQAAAAIAAYagAAAAEBgXV+aAU7XQGV43fB6D4JGJ8JvYmBQdMaboVeVUwrR7pXjXydM756ckqaSga0Mduw==", null, false, "2b8c08e8-597c-44db-9d99-623a6c9f9c64", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -799,6 +807,11 @@ namespace LexiMon.Repository.Migrations
                 column: "LessonId",
                 unique: true,
                 filter: "[LessonId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LessonProgress_UserId",
+                table: "LessonProgress",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Order_CourseId",
