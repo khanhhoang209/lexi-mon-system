@@ -59,6 +59,9 @@ public class Program
         builder.Services.AddScoped<ILessonProgressService, LessonProgressService>();
         builder.Services.AddScoped<ICategoryService, CategoryService>();
         builder.Services.AddScoped<IItemService, ItemService>();
+        builder.Services.AddScoped<IEnemyService, EnemyService>();
+        builder.Services.AddScoped<IEnemyLevelService, EnemyLevelService>();
+        builder.Services.AddScoped<ILevelRangeService, LevelRangeService>();
         
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
