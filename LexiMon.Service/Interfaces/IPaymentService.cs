@@ -7,6 +7,6 @@ namespace LexiMon.Service.Interfaces;
 public interface IPaymentService
 {
     Task<ServiceResponse> CreatePayment(PaymentRequest requestBody, CancellationToken cancellationToken = default);
-    Task<ServiceResponse> PaymentReturn(long orderCode, CancellationToken cancellationToken = default);
-    Task<ServiceResponse> PaymentCancel(long orderCode, CancellationToken cancellationToken = default);
+    Task<ServiceResponse> PaymentReturn(Guid orderId, CancellationToken cancellationToken = default);
+    Task<ServiceResponse> PaymentCancel(Guid orderId, CancellationToken cancellationToken = default);
 }
