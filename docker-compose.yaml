@@ -22,7 +22,6 @@ services:
     image: nginxproxy/acme-companion:2.6.0
     container_name: nginx-proxy-acme
     environment:
-      - ACME_CA_URI=https://acme-staging-v02.api.letsencrypt.org/directory
       - DEFAULT_EMAIL=${DEFAULT_EMAIL}
       - NGINX_PROXY_CONTAINER=nginx-proxy
     volumes:

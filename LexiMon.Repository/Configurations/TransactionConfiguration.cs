@@ -23,9 +23,6 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
             .HasPrecision(18, 2)
             .IsRequired();
 
-        builder.Property(t => t.TransactionDate)
-            .IsRequired();
-
         builder.Property(t => t.PaymentMethod)
             .IsRequired();
 
