@@ -18,7 +18,8 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpPost("{orderId:Guid}")]
-    public async Task<IResult> CreatePayment([FromRoute] Guid orderId, CancellationToken cancellationToken = default)
+    public async Task<IResult> CreatePayment([FromRoute] Guid orderId,
+        CancellationToken cancellationToken = default)
     {
         var request = new PaymentRequest
         {
@@ -34,11 +35,30 @@ public class PaymentsController : ControllerBase
         return TypedResults.BadRequest(serviceResponse);
     }
 
-    [HttpPost("webhook")]
-    public async Task<IResult> HandleWebhook([FromBody] WebhookType webhookType,CancellationToken cancellationToken = default)
+    [HttpGet("return")]
+    public async Task<IResult> PaymentReturn([FromQuery] long orderCode,
+        CancellationToken cancellationToken = default)
     {
-        var result = await _paymentService.HandleWebhook(webhookType, cancellationToken);
-        if (result.Succeeded) return TypedResults.Ok();
-        return TypedResults.BadRequest(result);
+        var serviceResponse = await _paymentService.PaymentReturn(orderCode, cancellationToken);
+        if (serviceResponse.Succeeded)
+        {
+            return TypedResults.Ok(serviceResponse);
+        }
+
+        return TypedResults.BadRequest(serviceResponse);
     }
+
+    [HttpGet("cancel")]
+    public async Task<IResult> PaymentCancel([FromQuery] long orderCode,
+        CancellationToken cancellationToken = default)
+    {
+        var serviceResponse = await _paymentService.PaymentCancel(orderCode, cancellationToken);
+        if (serviceResponse.Succeeded)
+        {
+            return TypedResults.Ok(serviceResponse);
+        }
+
+        return TypedResults.BadRequest(serviceResponse);
+    }
+
 }
