@@ -8,6 +8,7 @@ using LexiMon.Service.ApiResponse;
 using LexiMon.Service.Configs;
 using LexiMon.Service.Interfaces;
 using LexiMon.Service.Models.Requests;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -64,21 +65,7 @@ public class PaymentService : IPaymentService
         var orderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         var item = new ItemData(itemName, 1, (int)order.PurchaseCost!);
         var items = new List<ItemData> { item };
-
         var expiredAt = TimeConverter.GetCurrentVietNamTime().AddSeconds(_payOsSetings.ExpirationSeconds).ToUnixTimeSeconds();
-        var signatureData = new Dictionary<string, object>
-        {
-            { "orderCode", orderCode },
-            { "amount", item.price },
-            { "description", itemName },
-            { "items", Newtonsoft.Json.JsonConvert.SerializeObject(items) },
-            { "returnUrl", $"{_payOsSetings.BaseUrl}/return" },
-            { "cancelUrl", $"{_payOsSetings.BaseUrl}/cancel" },
-            { "expiredAt", expiredAt }
-        };
-
-        var signature = GenerateSignature(signatureData, _payOsSetings.ChecksumKey);
-        _logger.LogInformation("Generated Signature: {Signature}", signature);
 
         var data = new PaymentData(
             orderCode: orderCode,
@@ -87,8 +74,7 @@ public class PaymentService : IPaymentService
             items: items,
             returnUrl: $"{_payOsSetings.BaseUrl}/return",
             cancelUrl: $"{_payOsSetings.BaseUrl}/cancel",
-            expiredAt: expiredAt,
-            signature: signature
+            expiredAt: expiredAt
         );
 
         var response = await _payOs.createPaymentLink(data);
