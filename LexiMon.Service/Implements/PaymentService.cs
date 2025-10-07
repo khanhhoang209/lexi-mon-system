@@ -70,10 +70,10 @@ public class PaymentService : IPaymentService
         var data = new PaymentData(
             orderCode: orderCode,
             amount: item.price,
-            description: $"{itemName}",
+            description: "Thanh toán đơn hàng",
             items: items,
-            returnUrl: $"{_payOsSetings.BaseUrl}/return",
-            cancelUrl: $"{_payOsSetings.BaseUrl}/cancel",
+            returnUrl: $"{_payOsSetings.BaseUrl}/payments/return?orderCode={orderCode}",
+            cancelUrl: $"{_payOsSetings.BaseUrl}/payments/cancel?orderCode={orderCode}",
             expiredAt: expiredAt
         );
 
@@ -105,29 +105,14 @@ public class PaymentService : IPaymentService
         };
     }
 
-    public async Task<ServiceResponse> HandleWebhook(WebhookType webhookType, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse> PaymentReturn(long orderCode, CancellationToken cancellationToken = default)
     {
-        var webhookData = _payOs.verifyPaymentWebhookData(webhookType);
-
-        if (webhookData == null!)
-        {
-            _logger.LogError("Invalid webhook data");
-            return new ServiceResponse()
-            {
-                Succeeded = false,
-                Message = "Dữ liệu webhook không hợp lệ!"
-            };
-        }
-
-        _logger.LogInformation("Webhook: {WebhookType}", webhookType);
-
         var transactionRepo = _unitOfWork.GetRepository<Transaction, Guid>();
         var transaction = await transactionRepo.Query()
-            .FirstOrDefaultAsync(t => t.OrderCode == webhookData.orderCode, cancellationToken);
+            .FirstOrDefaultAsync(t => t.OrderCode == orderCode, cancellationToken);
 
-        if (transaction == null)
-        {
-            _logger.LogError("Order not found: {OrderCode}", webhookData.orderCode);
+        if (transaction == null) {
+            _logger.LogError("Order not found with OrderCode: {OrderCode}", orderCode);
             return new ServiceResponse()
             {
                 Succeeded = false,
@@ -135,94 +120,60 @@ public class PaymentService : IPaymentService
             };
         }
 
-        if (webhookData.code == "00")
+        if (transaction.TransactionStatus != TransactionStatus.Pending)
         {
-            transaction.TransactionStatus = TransactionStatus.Return;
+            _logger.LogError("Payment return {@TransactionStatus}", transaction.TransactionStatus);
+            return new ServiceResponse()
+            {
+                Succeeded = false,
+                Message = "Giao dịch không hợp lệ!"
+            };
         }
 
-        if (webhookData.code is "20" or "401")
-        {
-            transaction.TransactionStatus = TransactionStatus.Fail;
-        }
-
+        transaction.TransactionStatus = TransactionStatus.Return;
         await transactionRepo.UpdateAsync(transaction, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        _logger.LogInformation("Updated transaction: {@transaction}", transaction);
+        _logger.LogInformation("Payment return success: {@transaction}", transaction);
         return new ServiceResponse()
         {
             Succeeded = true,
-            Message = "Xử lý webhook thành công!"
+            Message = "Thanh toán thành công!"
         };
     }
 
-
-    public bool IsValidData(string transaction)
+    public async Task<ServiceResponse> PaymentCancel(long orderCode, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            // Parse JSON
-            var envelope = JObject.Parse(transaction);
+        var transactionRepo = _unitOfWork.GetRepository<Transaction, Guid>();
+        var transaction = await transactionRepo.Query()
+            .FirstOrDefaultAsync(t => t.OrderCode == orderCode, cancellationToken);
 
-            var data = envelope["data"] as JObject;
-            var signature = envelope["signature"]?.ToString();
-            var checksumKey = _payOsSetings.ChecksumKey;
-
-            // Sort keys alphabetically
-            var sortedKeys = data!.Properties()
-                .Select(p => p.Name)
-                .OrderBy(name => name, StringComparer.Ordinal)
-                .ToList();
-
-            // Build key=value&key=value string
-            var sb = new StringBuilder();
-            for (var i = 0; i < sortedKeys.Count; i++)
+        if (transaction == null) {
+            _logger.LogError("Order not found with OrderCode: {OrderId}", orderCode);
+            return new ServiceResponse()
             {
-                var key = sortedKeys[i];
-                var value = data[key]?.ToString() ?? string.Empty;
-                sb.Append($"{key}={value}");
-                if (i < sortedKeys.Count - 1)
-                    sb.Append("&");
-            }
-
-            // Compute HMAC-SHA256
-            var computedSignature = ComputeHmacSha256Hex(sb.ToString(), checksumKey);
-
-            return string.Equals(computedSignature, signature, StringComparison.OrdinalIgnoreCase);
+                Succeeded = false,
+                Message = "Không tìm thấy giao dịch!"
+            };
         }
-        catch (Exception ex)
+
+        if (transaction.TransactionStatus != TransactionStatus.Pending)
         {
-            Console.WriteLine($"Error verifying signature: {ex.Message}");
-            return false;
+            _logger.LogError("Payment return {@TransactionStatus}", transaction.TransactionStatus);
+            return new ServiceResponse()
+            {
+                Succeeded = false,
+                Message = "Giao dịch không hợp lệ!"
+            };
         }
-    }
 
-    private string ComputeHmacSha256Hex(string data, string key)
-    {
-        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(key));
-        var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
-        return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-    }
-
-    public string GenerateSignature(IDictionary<string, object> data, string checksumKey)
-    {
-        var sortedKeys = data.Keys.OrderBy(k => k, StringComparer.Ordinal).ToList();
-
-        var sb = new StringBuilder();
-        for (int i = 0; i < sortedKeys.Count; i++)
+        transaction.TransactionStatus = TransactionStatus.Return;
+        await transactionRepo.UpdateAsync(transaction, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Payment return success: {@transaction}", transaction);
+        return new ServiceResponse()
         {
-            var key = sortedKeys[i];
-            var value = data[key]?.ToString() ?? string.Empty;
-            sb.Append($"{key}={value}");
-            if (i < sortedKeys.Count - 1)
-                sb.Append("&");
-        }
-
-        var dataQueryStr = sb.ToString();
-
-        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(checksumKey));
-        var hashBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(dataQueryStr));
-
-        return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+            Succeeded = true,
+            Message = "Hủy thanh toán thành công!"
+        };
     }
 }
