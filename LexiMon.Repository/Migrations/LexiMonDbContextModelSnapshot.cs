@@ -310,7 +310,7 @@ namespace LexiMon.Repository.Migrations
                             Id = "5d7efb6d-0d52-4159-ab2e-7fd356973925",
                             AccessFailedCount = 0,
                             Coins = 0m,
-                            ConcurrencyStamp = "a455b6c2-eea0-4c23-a75f-16c17420ea1c",
+                            ConcurrencyStamp = "7ff7eef9-c110-42e5-ad8d-99c23a74efa9",
                             CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             DeletedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "free@example.com",
@@ -319,9 +319,9 @@ namespace LexiMon.Repository.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "FREE@EXAMPLE.COM",
                             NormalizedUserName = "FREE@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEO14X3TFmvQxkueAdm8oMJmynut4423zaFnF16haOmQinu6A1aPFvDHR+geid6vs7w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAhehfnqlOXE+AQhVxgE+y0u4d1/VM0DfsZM+mWvihrmzK4Ds/09Ic1t+JPek0FxJw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b501dd88-2f58-4832-8910-9e598b076baa",
+                            SecurityStamp = "bf2b7a1e-e14a-4c73-83f1-782895b17028",
                             Status = true,
                             TwoFactorEnabled = false,
                             UpdatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
@@ -332,7 +332,7 @@ namespace LexiMon.Repository.Migrations
                             Id = "c2765f80-383f-46f2-9a73-ec47863100ae",
                             AccessFailedCount = 0,
                             Coins = 0m,
-                            ConcurrencyStamp = "3a121f08-71a4-4b4d-b6d5-899de97fd6d5",
+                            ConcurrencyStamp = "46e23d7a-6a9b-4d0f-b896-f8093f03af8e",
                             CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             DeletedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "premium@example.com",
@@ -341,9 +341,9 @@ namespace LexiMon.Repository.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "PREMIUM@EXAMPLE.COM",
                             NormalizedUserName = "PREMIUM@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBgXV+aAU7XQGV43fB6D4JGJ8JvYmBQdMaboVeVUwrR7pXjXydM756ckqaSga0Mduw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKlObO4DNMYLc30GHVdpVHGY5H/Eleky4P0LSkStXOD3ZJyfjcXWz3Wny0BOVllcpA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2b8c08e8-597c-44db-9d99-623a6c9f9c64",
+                            SecurityStamp = "2707aaba-7ee4-4901-9cf7-75098da5e768",
                             Status = true,
                             TwoFactorEnabled = false,
                             UpdatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
@@ -354,7 +354,7 @@ namespace LexiMon.Repository.Migrations
                             Id = "88f1581b-4f4e-4831-8cf8-ee4afed04c11",
                             AccessFailedCount = 0,
                             Coins = 0m,
-                            ConcurrencyStamp = "d47817c6-a5fe-49df-a350-39e6441844ae",
+                            ConcurrencyStamp = "8a245d1c-347d-413d-90d6-dd19afb7b6d3",
                             CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             DeletedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "admin@example.com",
@@ -363,9 +363,9 @@ namespace LexiMon.Repository.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMBeEyOJRLfaBNw34+/0g4HMWMrmiX0vxSIrXghD4YDw+RQpcRYKicpJCTCsPuQXXw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFC6+RlD2sTFfw8eNaPCnABac5a/kWQDo4G4SzkSd8LAzkLrGPqg3+PRqjFYnWpiGQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "62b27bf9-c2e8-4adf-a34d-d9aea5fdd47b",
+                            SecurityStamp = "5ca59d63-5448-4ee6-bbae-842281754521",
                             Status = true,
                             TwoFactorEnabled = false,
                             UpdatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
@@ -957,6 +957,68 @@ namespace LexiMon.Repository.Migrations
                     b.HasIndex("LessonId");
 
                     b.ToTable("Question", (string)null);
+                });
+
+            modelBuilder.Entity("LexiMon.Repository.Domains.Transaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("CheckoutUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("OrderCode")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PaymentLinkId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("int");
+
+                    b.Property<string>("QrCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset>("TransactionDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("TransactionStatus")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Transaction", (string)null);
                 });
 
             modelBuilder.Entity("LexiMon.Repository.Domains.UserDeck", b =>
