@@ -2,6 +2,7 @@
 using LexiMon.Service.Interfaces;
 using LexiMon.Service.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
+using Net.payOS.Types;
 
 namespace LexiMon.API.Controllers;
 
@@ -34,14 +35,9 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpPost("webhook")]
-    public async Task<IResult> HandleWebhook(CancellationToken cancellationToken = default)
+    public async Task<IResult> HandleWebhook([FromBody] WebhookType webhookType,CancellationToken cancellationToken = default)
     {
-        Request.EnableBuffering();
-        using var reader = new StreamReader(Request.Body, Encoding.UTF8, leaveOpen: true);
-        var rawBody = await reader.ReadToEndAsync(cancellationToken);
-        Request.Body.Position = 0;
-
-        var result = await _paymentService.HandleWebhook(rawBody, cancellationToken);
+        var result = await _paymentService.HandleWebhook(webhookType, cancellationToken);
         if (result.Succeeded) return TypedResults.Ok();
         return TypedResults.BadRequest(result);
     }

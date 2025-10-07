@@ -119,51 +119,50 @@ public class PaymentService : IPaymentService
         };
     }
 
-    public async Task<ServiceResponse> HandleWebhook(string transaction, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse> HandleWebhook(WebhookType webhookType, CancellationToken cancellationToken = default)
     {
-        var validData = IsValidData(transaction);
-        if (!validData)
+        var webhookData = _payOs.verifyPaymentWebhookData(webhookType);
+
+        if (webhookData == null!)
         {
-            _logger.LogWarning("Invalid webhook data: {Transaction}", transaction);
+            _logger.LogError("Invalid webhook data");
             return new ServiceResponse()
             {
                 Succeeded = false,
-                Message = "Dữ liệu không hợp lệ!"
+                Message = "Dữ liệu webhook không hợp lệ!"
             };
         }
 
-        var envelope = JObject.Parse(transaction);
-
-        var data = envelope["data"] as JObject;
-        if (data == null)
-        {
-            _logger.LogError("Data field is missing in webhook payload");
-            return new ServiceResponse()
-            {
-                Succeeded = false,
-                Message = "Dữ liệu không hợp lệ!"
-            };
-        }
-        var orderCode = data["orderCode"]?.ToObject<long>();
+        _logger.LogInformation("Webhook: {WebhookType}", webhookType);
 
         var transactionRepo = _unitOfWork.GetRepository<Transaction, Guid>();
-        var transactionEntity = await transactionRepo.Query()
-            .FirstOrDefaultAsync(t => t.OrderCode == orderCode, cancellationToken);
-        if (transactionEntity == null)
+        var transaction = await transactionRepo.Query()
+            .FirstOrDefaultAsync(t => t.OrderCode == webhookData.orderCode, cancellationToken);
+
+        if (transaction == null)
         {
-            _logger.LogError("Transaction not found for OrderCode: {OrderCode}", orderCode);
+            _logger.LogError("Order not found: {OrderCode}", webhookData.orderCode);
             return new ServiceResponse()
             {
                 Succeeded = false,
-                Message = "Giao dịch không tồn tại!"
+                Message = "Không tìm thấy giao dịch!"
             };
         }
 
-        transactionEntity.TransactionStatus = TransactionStatus.Return;
-        _logger.LogInformation("Transaction updated to Return for OrderCode: {OrderCode}", orderCode);
-        await transactionRepo.UpdateAsync(transactionEntity, cancellationToken);
+        if (webhookData.code == "00")
+        {
+            transaction.TransactionStatus = TransactionStatus.Return;
+        }
+
+        if (webhookData.code is "20" or "401")
+        {
+            transaction.TransactionStatus = TransactionStatus.Fail;
+        }
+
+        await transactionRepo.UpdateAsync(transaction, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+        _logger.LogInformation("Updated transaction: {@transaction}", transaction);
         return new ServiceResponse()
         {
             Succeeded = true,
