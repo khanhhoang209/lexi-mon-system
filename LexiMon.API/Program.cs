@@ -7,6 +7,7 @@ using LexiMon.Repository.Domains;
 using LexiMon.Repository.Implements;
 using LexiMon.Repository.Interceptors;
 using LexiMon.Repository.Interfaces;
+using LexiMon.Service.Configs;
 using LexiMon.Service.Implements;
 using LexiMon.Service.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Net.payOS.Constants;
 using IPNetwork = Microsoft.AspNetCore.HttpOverrides.IPNetwork;
 
 namespace LexiMon.API;
@@ -25,6 +27,9 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.Configure<PayOsSetings>(builder.Configuration.GetSection("PayOS"));
+
         builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         builder.Services.AddSingleton(sp =>
         {
@@ -62,7 +67,8 @@ public class Program
         builder.Services.AddScoped<IEnemyService, EnemyService>();
         builder.Services.AddScoped<IEnemyLevelService, EnemyLevelService>();
         builder.Services.AddScoped<ILevelRangeService, LevelRangeService>();
-        
+        builder.Services.AddScoped<IPaymentService, PaymentService>();
+
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
