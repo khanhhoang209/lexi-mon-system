@@ -4,6 +4,7 @@ public class ItemResponseDto
 {
     public Guid ItemId { get; set; }
     public string ItemName { get; set; } = null!;
+    public bool IsPremium { get; set; } = false;
     public Guid CategoryId { get; set; }
     public string? CategoryName { get; set; } = null!;
     public Decimal? Price { get; set; }
@@ -11,5 +12,5 @@ public class ItemResponseDto
     public string? ImageUrl { get; set; }
     public string? Description { get; set; }
     public bool IsActive {get;set;}
-    
+
 }

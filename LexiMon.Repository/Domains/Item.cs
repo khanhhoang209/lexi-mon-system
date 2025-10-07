@@ -6,6 +6,7 @@ public class Item : BaseAuditableEntity<Guid>
 {
     public Guid CategoryId { get; set; }
     public string Name { get; set; } = null!;
+    public bool IsPremium { get; set; } = false;
     public Decimal? Price { get; set; }
     public Decimal? Coin { get; set; }
     public string? ImageUrl { get; set; }
