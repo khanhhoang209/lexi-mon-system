@@ -7,5 +7,6 @@ namespace LexiMon.Service.Interfaces;
 public interface IPaymentService
 {
     Task<ServiceResponse> CreatePayment(PaymentRequest requestBody, CancellationToken cancellationToken = default);
-    Task<ServiceResponse> HandleWebhook(WebhookType webhookType, CancellationToken cancellationToken = default);
+    Task<ServiceResponse> PaymentReturn(long orderCode, CancellationToken cancellationToken = default);
+    Task<ServiceResponse> PaymentCancel(long orderCode, CancellationToken cancellationToken = default);
 }
