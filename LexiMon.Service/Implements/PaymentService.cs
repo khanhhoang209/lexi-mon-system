@@ -65,7 +65,20 @@ public class PaymentService : IPaymentService
         var item = new ItemData(itemName, 1, (int)order.PurchaseCost!);
         var items = new List<ItemData> { item };
 
-        var expiredAt = DateTimeOffset.UtcNow.AddSeconds(_payOsSetings.ExpirationSeconds).ToUnixTimeSeconds();
+        var expiredAt = TimeConverter.GetCurrentVietNamTime().AddSeconds(_payOsSetings.ExpirationSeconds).ToUnixTimeSeconds();
+        var signatureData = new Dictionary<string, object>
+        {
+            { "orderCode", orderCode },
+            { "amount", item.price },
+            { "description", itemName },
+            { "items", Newtonsoft.Json.JsonConvert.SerializeObject(items) },
+            { "returnUrl", $"{_payOsSetings.BaseUrl}/return" },
+            { "cancelUrl", $"{_payOsSetings.BaseUrl}/cancel" },
+            { "expiredAt", expiredAt }
+        };
+
+        var signature = GenerateSignature(signatureData, _payOsSetings.ChecksumKey);
+        _logger.LogInformation("Generated Signature: {Signature}", signature);
 
         var data = new PaymentData(
             orderCode: orderCode,
@@ -74,7 +87,8 @@ public class PaymentService : IPaymentService
             items: items,
             returnUrl: $"{_payOsSetings.BaseUrl}/return",
             cancelUrl: $"{_payOsSetings.BaseUrl}/cancel",
-            expiredAt: expiredAt
+            expiredAt: expiredAt,
+            signature: signature
         );
 
         var response = await _payOs.createPaymentLink(data);
@@ -198,10 +212,32 @@ public class PaymentService : IPaymentService
         }
     }
 
-    private static string ComputeHmacSha256Hex(string data, string key)
+    private string ComputeHmacSha256Hex(string data, string key)
     {
         using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(key));
         var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
         return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+    }
+
+    public string GenerateSignature(IDictionary<string, object> data, string checksumKey)
+    {
+        var sortedKeys = data.Keys.OrderBy(k => k, StringComparer.Ordinal).ToList();
+
+        var sb = new StringBuilder();
+        for (int i = 0; i < sortedKeys.Count; i++)
+        {
+            var key = sortedKeys[i];
+            var value = data[key]?.ToString() ?? string.Empty;
+            sb.Append($"{key}={value}");
+            if (i < sortedKeys.Count - 1)
+                sb.Append("&");
+        }
+
+        var dataQueryStr = sb.ToString();
+
+        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(checksumKey));
+        var hashBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(dataQueryStr));
+
+        return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
     }
 }
