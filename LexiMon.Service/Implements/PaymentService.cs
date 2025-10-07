@@ -3,6 +3,7 @@ using System.Text;
 using LexiMon.Repository.Domains;
 using LexiMon.Repository.Enum;
 using LexiMon.Repository.Interfaces;
+using LexiMon.Repository.Utils;
 using LexiMon.Service.ApiResponse;
 using LexiMon.Service.Configs;
 using LexiMon.Service.Interfaces;
@@ -64,13 +65,16 @@ public class PaymentService : IPaymentService
         var item = new ItemData(itemName, 1, (int)order.PurchaseCost!);
         var items = new List<ItemData> { item };
 
+        var expiredAt = DateTimeOffset.UtcNow.AddSeconds(_payOsSetings.ExpirationSeconds).ToUnixTimeSeconds();
+
         var data = new PaymentData(
             orderCode: orderCode,
             amount: item.price,
             description: $"{itemName}",
             items: items,
             returnUrl: $"{_payOsSetings.BaseUrl}/return",
-            cancelUrl: $"{_payOsSetings.BaseUrl}/cancel"
+            cancelUrl: $"{_payOsSetings.BaseUrl}/cancel",
+            expiredAt: expiredAt
         );
 
         var response = await _payOs.createPaymentLink(data);
@@ -86,7 +90,6 @@ public class PaymentService : IPaymentService
             QrCode = response.qrCode,
             Amount = (decimal)order.PurchaseCost,
             Description = data.description,
-            TransactionDate = DateTimeOffset.UtcNow,
             TransactionStatus = TransactionStatus.Pending,
             PaymentMethod = PaymentMethod.PayOs,
         };
