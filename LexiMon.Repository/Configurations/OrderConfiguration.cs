@@ -18,9 +18,6 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(x => x.CoinCost)
             .HasPrecision(18, 2);
 
-        builder.Property(x => x.PaidAt)
-            .IsRequired();
-
         builder.Property(x => x.PaymentStatus)
             .IsRequired();
 

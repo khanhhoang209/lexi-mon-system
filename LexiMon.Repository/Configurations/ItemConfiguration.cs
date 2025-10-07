@@ -16,6 +16,10 @@ public class ItemConfiguration : IEntityTypeConfiguration<Item>
             .HasMaxLength(200)
             .IsRequired();
 
+        builder.Property(x => x.IsPremium)
+            .HasDefaultValue(false)
+            .IsRequired();
+
         builder.Property(x => x.Price)
             .HasPrecision(18, 2);
 
