@@ -8,6 +8,7 @@ using LexiMon.Service.ApiResponse;
 using LexiMon.Service.Configs;
 using LexiMon.Service.Interfaces;
 using LexiMon.Service.Models.Requests;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -64,21 +65,7 @@ public class PaymentService : IPaymentService
         var orderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         var item = new ItemData(itemName, 1, (int)order.PurchaseCost!);
         var items = new List<ItemData> { item };
-
         var expiredAt = TimeConverter.GetCurrentVietNamTime().AddSeconds(_payOsSetings.ExpirationSeconds).ToUnixTimeSeconds();
-        var signatureData = new Dictionary<string, object>
-        {
-            { "orderCode", orderCode },
-            { "amount", item.price },
-            { "description", itemName },
-            { "items", Newtonsoft.Json.JsonConvert.SerializeObject(items) },
-            { "returnUrl", $"{_payOsSetings.BaseUrl}/return" },
-            { "cancelUrl", $"{_payOsSetings.BaseUrl}/cancel" },
-            { "expiredAt", expiredAt }
-        };
-
-        var signature = GenerateSignature(signatureData, _payOsSetings.ChecksumKey);
-        _logger.LogInformation("Generated Signature: {Signature}", signature);
 
         var data = new PaymentData(
             orderCode: orderCode,
@@ -87,8 +74,7 @@ public class PaymentService : IPaymentService
             items: items,
             returnUrl: $"{_payOsSetings.BaseUrl}/return",
             cancelUrl: $"{_payOsSetings.BaseUrl}/cancel",
-            expiredAt: expiredAt,
-            signature: signature
+            expiredAt: expiredAt
         );
 
         var response = await _payOs.createPaymentLink(data);
@@ -119,51 +105,50 @@ public class PaymentService : IPaymentService
         };
     }
 
-    public async Task<ServiceResponse> HandleWebhook(string transaction, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse> HandleWebhook(WebhookType webhookType, CancellationToken cancellationToken = default)
     {
-        var validData = IsValidData(transaction);
-        if (!validData)
+        var webhookData = _payOs.verifyPaymentWebhookData(webhookType);
+
+        if (webhookData == null!)
         {
-            _logger.LogWarning("Invalid webhook data: {Transaction}", transaction);
+            _logger.LogError("Invalid webhook data");
             return new ServiceResponse()
             {
                 Succeeded = false,
-                Message = "Dữ liệu không hợp lệ!"
+                Message = "Dữ liệu webhook không hợp lệ!"
             };
         }
 
-        var envelope = JObject.Parse(transaction);
-
-        var data = envelope["data"] as JObject;
-        if (data == null)
-        {
-            _logger.LogError("Data field is missing in webhook payload");
-            return new ServiceResponse()
-            {
-                Succeeded = false,
-                Message = "Dữ liệu không hợp lệ!"
-            };
-        }
-        var orderCode = data["orderCode"]?.ToObject<long>();
+        _logger.LogInformation("Webhook: {WebhookType}", webhookType);
 
         var transactionRepo = _unitOfWork.GetRepository<Transaction, Guid>();
-        var transactionEntity = await transactionRepo.Query()
-            .FirstOrDefaultAsync(t => t.OrderCode == orderCode, cancellationToken);
-        if (transactionEntity == null)
+        var transaction = await transactionRepo.Query()
+            .FirstOrDefaultAsync(t => t.OrderCode == webhookData.orderCode, cancellationToken);
+
+        if (transaction == null)
         {
-            _logger.LogError("Transaction not found for OrderCode: {OrderCode}", orderCode);
+            _logger.LogError("Order not found: {OrderCode}", webhookData.orderCode);
             return new ServiceResponse()
             {
                 Succeeded = false,
-                Message = "Giao dịch không tồn tại!"
+                Message = "Không tìm thấy giao dịch!"
             };
         }
 
-        transactionEntity.TransactionStatus = TransactionStatus.Return;
-        _logger.LogInformation("Transaction updated to Return for OrderCode: {OrderCode}", orderCode);
-        await transactionRepo.UpdateAsync(transactionEntity, cancellationToken);
+        if (webhookData.code == "00")
+        {
+            transaction.TransactionStatus = TransactionStatus.Return;
+        }
+
+        if (webhookData.code is "20" or "401")
+        {
+            transaction.TransactionStatus = TransactionStatus.Fail;
+        }
+
+        await transactionRepo.UpdateAsync(transaction, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+        _logger.LogInformation("Updated transaction: {@transaction}", transaction);
         return new ServiceResponse()
         {
             Succeeded = true,
