@@ -205,6 +205,31 @@ namespace LexiMon.Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Transaction",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrderCode = table.Column<long>(type: "bigint", nullable: false),
+                    PaymentLinkId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CheckoutUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    QrCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentMethod = table.Column<int>(type: "int", nullable: false),
+                    TransactionStatus = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transaction", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -375,6 +400,7 @@ namespace LexiMon.Repository.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    IsPremium = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     Coin = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -556,7 +582,7 @@ namespace LexiMon.Repository.Migrations
                     ItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PurchaseCost = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     CoinCost = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
-                    PaidAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    PaidAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     PaymentStatus = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
@@ -694,9 +720,9 @@ namespace LexiMon.Repository.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "Address", "BirthDate", "ConcurrencyStamp", "CreatedAt", "DeletedAt", "Email", "EmailConfirmed", "FirstName", "Gender", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "Status", "TwoFactorEnabled", "UpdatedAt", "UserName" },
                 values: new object[,]
                 {
-                    { "5d7efb6d-0d52-4159-ab2e-7fd356973925", 0, null, null, "a455b6c2-eea0-4c23-a75f-16c17420ea1c", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com", true, null, 3, null, false, null, "FREE@EXAMPLE.COM", "FREE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEO14X3TFmvQxkueAdm8oMJmynut4423zaFnF16haOmQinu6A1aPFvDHR+geid6vs7w==", null, false, "b501dd88-2f58-4832-8910-9e598b076baa", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com" },
-                    { "88f1581b-4f4e-4831-8cf8-ee4afed04c11", 0, null, null, "d47817c6-a5fe-49df-a350-39e6441844ae", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com", true, null, 3, null, false, null, "ADMIN@EXAMPLE.COM", "ADMIN@EXAMPLE.COM", "AQAAAAIAAYagAAAAEMBeEyOJRLfaBNw34+/0g4HMWMrmiX0vxSIrXghD4YDw+RQpcRYKicpJCTCsPuQXXw==", null, false, "62b27bf9-c2e8-4adf-a34d-d9aea5fdd47b", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com" },
-                    { "c2765f80-383f-46f2-9a73-ec47863100ae", 0, null, null, "3a121f08-71a4-4b4d-b6d5-899de97fd6d5", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com", true, null, 3, null, false, null, "PREMIUM@EXAMPLE.COM", "PREMIUM@EXAMPLE.COM", "AQAAAAIAAYagAAAAEBgXV+aAU7XQGV43fB6D4JGJ8JvYmBQdMaboVeVUwrR7pXjXydM756ckqaSga0Mduw==", null, false, "2b8c08e8-597c-44db-9d99-623a6c9f9c64", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com" }
+                    { "5d7efb6d-0d52-4159-ab2e-7fd356973925", 0, null, null, "f2cfe86b-79dd-416e-a8df-0884d6358d43", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com", true, null, 3, null, false, null, "FREE@EXAMPLE.COM", "FREE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEEb05fMdLZ+tsa4RGYLa3AEfQk0Mx7pJki9JMSoxVEo3wqzGxN0Xt3X/GDg624EDPQ==", null, false, "6cc9ba44-df62-490a-80a6-ff88f382df54", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com" },
+                    { "88f1581b-4f4e-4831-8cf8-ee4afed04c11", 0, null, null, "7b8234e8-9060-430f-9d36-a1a2f7ac1953", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com", true, null, 3, null, false, null, "ADMIN@EXAMPLE.COM", "ADMIN@EXAMPLE.COM", "AQAAAAIAAYagAAAAEEx1req+EOy9Dg8NB4jnDv2r0MoyN4AgKtLt5QVGOU2kelZG4pDjkk2xmRprhm3gUw==", null, false, "e66fc254-9ff1-4edc-a422-12020dd32ba2", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com" },
+                    { "c2765f80-383f-46f2-9a73-ec47863100ae", 0, null, null, "e53cfa39-22b3-4116-aeac-4d98ecd54dfd", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com", true, null, 3, null, false, null, "PREMIUM@EXAMPLE.COM", "PREMIUM@EXAMPLE.COM", "AQAAAAIAAYagAAAAELteefEKKkW+Oo6VTBAphVSMDZnIlc0bTX2hEMKEMVcCBQ4F5t4XqWRjPLstBjgnwQ==", null, false, "cab7b76f-61d9-4e9b-9291-2c686ee6ff65", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -902,6 +928,9 @@ namespace LexiMon.Repository.Migrations
 
             migrationBuilder.DropTable(
                 name: "Product");
+
+            migrationBuilder.DropTable(
+                name: "Transaction");
 
             migrationBuilder.DropTable(
                 name: "UserDeck");
