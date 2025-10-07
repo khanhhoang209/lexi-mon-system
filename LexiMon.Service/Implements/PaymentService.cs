@@ -67,7 +67,7 @@ public class PaymentService : IPaymentService
         var data = new PaymentData(
             orderCode: orderCode,
             amount: item.price,
-            description: $"Thanh toán đơn hàng {order.Id}",
+            description: $"{itemName}",
             items: items,
             returnUrl: $"{_payOsSetings.BaseUrl}/return",
             cancelUrl: $"{_payOsSetings.BaseUrl}/cancel"
