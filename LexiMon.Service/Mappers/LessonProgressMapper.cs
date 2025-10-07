@@ -38,8 +38,8 @@ public static class LessonProgressMapper
             EndDate = request.EndDate,
             LessonId = request.LessonId,
             CustomLessonId = request.CustomLessonId,
-            CreatedAt = DateTimeOffset.Now,
-            Status = true
+            CreatedAt = DateTimeOffset.UtcNow,
+            Status = true,
         };
     }
 
@@ -50,6 +50,6 @@ public static class LessonProgressMapper
         lp.LessonProgressStatus = request.LessonProgressStatus;
         lp.EndDate = request.EndDate;
         lp.StartDate = request.StartDate;
-        lp.UpdatedAt = DateTimeOffset.Now;
+        lp.UpdatedAt = DateTimeOffset.UtcNow;
     }
 }

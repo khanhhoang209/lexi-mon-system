@@ -30,7 +30,8 @@ public static class AnimationMapper
             AnimationTypeId = request.AnimationTypeId,
             ItemId = request.ItemId,
             AnimationUrl = request.AnimationUrl,
-            Status = true
+            Status = true,
+            CreatedAt = DateTimeOffset.UtcNow
         };
     }
 
@@ -40,6 +41,6 @@ public static class AnimationMapper
         animation.AnimationUrl= request.AnimationUrl;
         animation.AnimationTypeId = request.AnimationTypeId;
         animation.ItemId = request.ItemId;
-        animation.UpdatedAt = DateTimeOffset.Now;
+        animation.UpdatedAt = DateTimeOffset.UtcNow;
     }
 }
