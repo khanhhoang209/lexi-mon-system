@@ -64,9 +64,9 @@ public class OrderService : IOrderService
 
 
         }
-        catch (Exception e)
+        catch
         {
-            _logger.LogError(e, "Create Order failed");
+            _logger.LogError("CreateOrder failed");
             return new ServiceResponse { Succeeded = false, Message = "Create order failed!" };
         }
     }
@@ -146,7 +146,7 @@ public class OrderService : IOrderService
                 Message = "Thanh toán đơn hàng thành công!"
             };
         }
-        catch (Exception ex)
+        catch
         {
             order.PaymentStatus = PaymentStatus.Fail;
             await _unitOfWork.GetRepository<Order, Guid>().UpdateAsync(order, cancellationToken);
@@ -195,7 +195,7 @@ public class OrderService : IOrderService
                 Message = "Hủy đơn hàng thành công!"
             };
         }
-        catch (Exception ex)
+        catch
         {
             order.PaymentStatus = PaymentStatus.Fail;
             await _unitOfWork.GetRepository<Order, Guid>().UpdateAsync(order, cancellationToken);
@@ -214,10 +214,9 @@ public class OrderService : IOrderService
     /// <summary>
     /// Kiểm tra rằng request chỉ chọn đúng 1 mục tiêu (Course hoặc Item)
     /// </summary>
-   
     private async Task<ServiceResponse> ValidateAndResolveTargetAsync(
         OrderRequestDto request,
-        string userId,                    // THÊM userId để check trùng theo user
+        string userId,                 
         CancellationToken ct)
     {
         var hasCourse = request.CourseId.HasValue;
@@ -226,13 +225,21 @@ public class OrderService : IOrderService
         if (!hasCourse && !hasItem)
         {
             _logger.LogError("CreateOrder: neither CourseId nor ItemId provided");
-            return new ServiceResponse { Succeeded = false, Message = "Either CourseId or ItemId must be provided!" };
+            return new ServiceResponse
+            {
+                Succeeded = false, 
+                Message = "Either CourseId or ItemId must be provided!"
+            };
         }
 
         if (hasCourse && hasItem)
         {
             _logger.LogError("CreateOrder: both CourseId and ItemId provided");
-            return new ServiceResponse { Succeeded = false, Message = "Only one of CourseId or ItemId can be provided!" };
+            return new ServiceResponse
+            {
+                Succeeded = false, 
+                Message = "Only one of CourseId or ItemId can be provided!"
+            };
         }
 
         var orderRepo = _unitOfWork.GetRepository<Order, Guid>();
@@ -244,10 +251,14 @@ public class OrderService : IOrderService
             if (item is null)
             {
                 _logger.LogError("CreateOrder: Item {ItemId} not found", request.ItemId);
-                return new ServiceResponse { Succeeded = false, Message = "Item not found!" };
+                return new ServiceResponse
+                {
+                    Succeeded = false, 
+                    Message = "Item not found!"
+                };
             }
 
-            // 2) Trùng theo user + item (chặn khi Pending hoặc Return)
+            // 2) Trùng theo user + item (chặn khi Pending or Return)
             var dupItem = await orderRepo.Query()
                 .AnyAsync(o => o.UserId == userId
                                && o.ItemId == request.ItemId
@@ -255,8 +266,8 @@ public class OrderService : IOrderService
                 , ct);
             if (dupItem)
             {
-                _logger.LogError("CreateOrder: Item {ItemId} already purchased (pending) by user {UserId}", request.ItemId, userId);
-                return new ServiceResponse { Succeeded = false, Message = "Item already purchased (pending)!" };
+                _logger.LogError("CreateOrder: Item {ItemId} already purchased (pending or paid) by user {UserId}", request.ItemId, userId);
+                return new ServiceResponse { Succeeded = false, Message = "Item already purchased (pending or paid)!" };
             }
         }
         else // hasCourse
@@ -277,8 +288,8 @@ public class OrderService : IOrderService
                     , ct);
             if (dupCourse)
             {
-                _logger.LogError("CreateOrder: Course {CourseId} already purchased (pending) by user {UserId}", request.CourseId, userId);
-                return new ServiceResponse { Succeeded = false, Message = "Course already purchased (pending)!" };
+                _logger.LogError("CreateOrder: Course {CourseId} already purchased (pending or paid) by user {UserId}", request.CourseId, userId);
+                return new ServiceResponse { Succeeded = false, Message = "Course already purchased (pending or paid)!" };
             }
         }
 

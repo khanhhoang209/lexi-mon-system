@@ -12,7 +12,7 @@ public class Item : BaseAuditableEntity<Guid>
     public string? ImageUrl { get; set; }
     public string? Description { get; set; }
     public Category? Category { get; set; } = null;
-    public Order? Order { get; set; } = null;
+    public ICollection<Order>? Orders { get; set; } = new  List<Order>();
     public ICollection<Equipment> Equipments { get; set; } = new List<Equipment>();
     public ICollection<Animation> Animations { get; set; } = new List<Animation>();
 }
