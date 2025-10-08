@@ -181,8 +181,11 @@ public class ItemService : IItemService
         var query = repo.Query();
         query = query.Include(i => i.Category);
         
-        if(!string.IsNullOrEmpty(request.Name))
-            query = query.Where(i => i.Name.Contains(request.Name));
+        if(!string.IsNullOrEmpty(request.ItemName))
+            query = query.Where(i => i.Name.Contains(request.ItemName));
+        
+        if(!string.IsNullOrEmpty(request.CategoryName))
+            query = query.Where(i => i.Category!.Name.Contains(request.CategoryName));
         
         if(request.MinPrice != null && request.MaxPrice != null)
         {
