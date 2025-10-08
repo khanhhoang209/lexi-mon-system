@@ -36,7 +36,7 @@ public static class ItemMapper
             ImageUrl = request.ImageUrl,
             Status = true,
             CategoryId = request.CategoryId,
-            CreatedAt = DateTimeOffset.Now
+            CreatedAt = DateTimeOffset.UtcNow
         };
     }
 
@@ -49,5 +49,6 @@ public static class ItemMapper
         item.Price = request.Price;
         item.ImageUrl = request.ImageUrl;
         item.CategoryId = request.CategoryId;
+        item.UpdatedAt = DateTimeOffset.UtcNow;
     }
 }
