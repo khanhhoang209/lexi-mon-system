@@ -7,6 +7,7 @@ using LexiMon.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using LexiMon.Service.Mappers;
 using LexiMon.Service.Models.Requests;
+using LexiMon.Service.Models.Responses;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
@@ -39,7 +40,7 @@ public class OrderService : IOrderService
                 return new ServiceResponse { Succeeded = false, Message = "User not found!" };
             }
 
-            var validationResponse = await ValidateAndResolveTargetAsync(request, cancellationToken);
+            var validationResponse = await ValidateAndResolveTargetAsync(request, userId, cancellationToken);
             if (!validationResponse.Succeeded)
             {
                 return validationResponse;
@@ -209,6 +210,66 @@ public class OrderService : IOrderService
         }
     }
 
+    public async Task<PaginatedResponse<OrderUserResponseDto>> GetAllUsersOrdersByUserId(
+        GetOrderUserRequest request,
+        string userId,
+        CancellationToken cancellationToken)
+    {
+        var repo = _unitOfWork.GetRepository<Order, Guid>();
+        var query = repo
+            .Query().Where(o => o.UserId == userId);
+        query = query
+            .Include(o => o.Course)
+            .Include(o => o.Item);
+
+        if (request.MinPrice != null && request.MaxPrice != null)
+        {
+            query = query.Where(o => (o.PurchaseCost >= request.MinPrice && o.PurchaseCost <= request.MaxPrice)
+                                     || (o.CoinCost >= request.MinPrice && o.CoinCost <= request.MaxPrice));
+        }
+        else if (request.MinPrice != null)
+        {
+            query = query.Where(o => o.PurchaseCost >= request.MinPrice || o.CoinCost >= request.MinPrice);
+        }
+        else if (request.MaxPrice != null)
+        {
+            query = query.Where(o => o.PurchaseCost <= request.MaxPrice || o.CoinCost <= request.MaxPrice);
+        }
+
+        if (request.PaymentStatus.HasValue)
+            query = query.Where(o => o.PaymentStatus == request.PaymentStatus);
+
+        if (!string.IsNullOrEmpty(request.Name))
+            query = query.Where(o => (o.Item != null && o.Item.Name.Contains(request.Name))
+                                     || (o.Course != null && o.Course.Title.Contains(request.Name)));
+        if (request.FromDate.HasValue && request.ToDate.HasValue)
+            query = query.Where(o => o.CreatedAt >= request.FromDate && o.CreatedAt <= request.ToDate);
+        else if (request.FromDate.HasValue)
+            query = query.Where(o => o.CreatedAt >= request.FromDate);
+        else if (request.ToDate.HasValue)
+            query = query.Where(o => o.CreatedAt <= request.ToDate);
+
+        var totalCount = query.Count();
+        var response = await query
+            .OrderByDescending(o => o.CreatedAt)
+            .Skip((request.Page - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .Select(o => o.ToOrderUserResponse())
+            .ToListAsync(cancellationToken);
+        return new PaginatedResponse<OrderUserResponseDto>
+        {
+            Succeeded = true,
+            Message = "Get orders successfully",
+            TotalCount = totalCount,
+            PageNumber = request.Page,
+            PageSize = request.PageSize,
+            TotalPages = (int)Math.Ceiling((double)totalCount / request.PageSize),
+            Data = response
+        };
+    }
+
+
+
     #region Helpers
 
     /// <summary>
@@ -216,19 +277,18 @@ public class OrderService : IOrderService
     /// </summary>
     private async Task<ServiceResponse> ValidateAndResolveTargetAsync(
         OrderRequestDto request,
-        CancellationToken cancellationToken)
+        string userId,                 
+        CancellationToken ct)
     {
-        // Chỉ 1 trong 2: CourseId XOR ItemId
         var hasCourse = request.CourseId.HasValue;
-        var hasItem = request.ItemId.HasValue;
-        var orderRepo = _unitOfWork.GetRepository<Order, Guid>();
-        var query = orderRepo.Query();
+        var hasItem   = request.ItemId.HasValue;
+
         if (!hasCourse && !hasItem)
         {
             _logger.LogError("CreateOrder: neither CourseId nor ItemId provided");
             return new ServiceResponse
             {
-                Succeeded = false,
+                Succeeded = false, 
                 Message = "Either CourseId or ItemId must be provided!"
             };
         }
@@ -238,63 +298,63 @@ public class OrderService : IOrderService
             _logger.LogError("CreateOrder: both CourseId and ItemId provided");
             return new ServiceResponse
             {
-                Succeeded = false,
-                Message = "CreateOrder: both CourseId and ItemId provided!"
+                Succeeded = false, 
+                Message = "Only one of CourseId or ItemId can be provided!"
             };
         }
+
+        var orderRepo = _unitOfWork.GetRepository<Order, Guid>();
 
         if (hasItem)
         {
             var itemRepo = _unitOfWork.GetRepository<Item, Guid>();
-            var item = await itemRepo.GetByIdAsync(request.ItemId!.Value, cancellationToken);
-            if (item == null)
+            var item = await itemRepo.GetByIdAsync(request.ItemId!.Value, ct);
+            if (item is null)
             {
                 _logger.LogError("CreateOrder: Item {ItemId} not found", request.ItemId);
                 return new ServiceResponse
                 {
-                    Succeeded = false,
+                    Succeeded = false, 
                     Message = "Item not found!"
                 };
             }
 
-            query = query.Where(o => o.ItemId == request.ItemId);
-            if (query.Any())
+            // 2) Trùng theo user + item (chặn khi Pending or Return)
+            var dupItem = await orderRepo.Query()
+                .AnyAsync(o => o.UserId == userId
+                               && o.ItemId == request.ItemId
+                               && (o.PaymentStatus == PaymentStatus.Pending || o.PaymentStatus == PaymentStatus.Return)
+                , ct);
+            if (dupItem)
             {
-                _logger.LogError("CreateOrder: Item {ItemId} already purchased", request.ItemId);
-                return new ServiceResponse
-                {
-                    Succeeded = false,
-                    Message = "Item already purchased!"
-                };
-            }
-            else
-            {
-                var courseRepo = _unitOfWork.GetRepository<Course, Guid>();
-                var course = await courseRepo.GetByIdAsync(request.CourseId!.Value, cancellationToken);
-                if (course == null)
-                {
-                    _logger.LogError("CreateOrder: Course {CourseId} not found", request.CourseId);
-                    return new ServiceResponse
-                    {
-                        Succeeded = false,
-                        Message = "Course not found!"
-                    };
-                }
-
-                query = query.Where(o => o.CourseId == request.CourseId);
-                if (query.Any())
-                {
-                    _logger.LogError("CreateOrder: Course {CourseId} already purchased", request.CourseId);
-                    return new ServiceResponse
-                    {
-                        Succeeded = false,
-                        Message = "Course already purchased!"
-                    };
-                }
+                _logger.LogError("CreateOrder: Item {ItemId} already purchased (pending or paid) by user {UserId}", request.ItemId, userId);
+                return new ServiceResponse { Succeeded = false, Message = "Item already purchased (pending or paid)!" };
             }
         }
-        return new ServiceResponse { Succeeded = true, Message = "Validation passed." };
+        else // hasCourse
+        {
+            var courseRepo = _unitOfWork.GetRepository<Course, Guid>();
+            var course = await courseRepo.GetByIdAsync(request.CourseId!.Value, ct);
+            if (course is null)
+            {
+                _logger.LogError("CreateOrder: Course {CourseId} not found", request.CourseId);
+                return new ServiceResponse { Succeeded = false, Message = "Course not found!" };
+            }
 
+            //Trùng user + course (chặn Pending or Return)
+            var dupCourse = await orderRepo.Query()
+                .AnyAsync(o => o.UserId == userId
+                            && o.CourseId == request.CourseId
+                            && (o.PaymentStatus == PaymentStatus.Pending || o.PaymentStatus == PaymentStatus.Return)
+                    , ct);
+            if (dupCourse)
+            {
+                _logger.LogError("CreateOrder: Course {CourseId} already purchased (pending or paid) by user {UserId}", request.CourseId, userId);
+                return new ServiceResponse { Succeeded = false, Message = "Course already purchased (pending or paid)!" };
+            }
+        }
+
+        return new ServiceResponse { Succeeded = true, Message = "Validation passed." };
     }
 
     private sealed record PricingInfo(decimal? PurchaseCost, decimal? CoinCost);
