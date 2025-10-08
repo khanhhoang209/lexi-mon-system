@@ -2,11 +2,13 @@ using System.Net;
 using System.Text;
 using Azure.Storage.Blobs;
 using LexiMon.API.Infrastructure;
+using LexiMon.API.Services;
 using LexiMon.Repository.Context;
 using LexiMon.Repository.Domains;
 using LexiMon.Repository.Implements;
 using LexiMon.Repository.Interceptors;
 using LexiMon.Repository.Interfaces;
+using LexiMon.Repository.Utils;
 using LexiMon.Service.Configs;
 using LexiMon.Service.Implements;
 using LexiMon.Service.Interfaces;
@@ -31,6 +33,7 @@ public class Program
         builder.Services.Configure<PayOsSetings>(builder.Configuration.GetSection("PayOS"));
 
         builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+        builder.Services.AddScoped<ISaveChangesInterceptor, LevelUpInterceptor>();
         builder.Services.AddSingleton(sp =>
         {
             var cfg = sp.GetRequiredService<IConfiguration>();
@@ -50,6 +53,9 @@ public class Program
         builder.Services.AddScoped<ILexiMonDbContext>(provider => provider.GetRequiredService<LexiMonDbContext>());
         builder.Services.AddSingleton(TimeProvider.System);
 
+        //Register current user service
+        builder.Services.AddScoped<IUser, CurrentUser>();
+
         // Register services
         builder.Services.AddScoped<IProductService, ProductService>();
         builder.Services.AddScoped<IUserService, UserService>();
@@ -68,6 +74,7 @@ public class Program
         builder.Services.AddScoped<IEnemyLevelService, EnemyLevelService>();
         builder.Services.AddScoped<ILevelRangeService, LevelRangeService>();
         builder.Services.AddScoped<IPaymentService, PaymentService>();
+        builder.Services.AddScoped<IOrderService, OrderService>();
 
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));

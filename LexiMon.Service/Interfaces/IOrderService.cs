@@ -6,7 +6,7 @@ public interface IOrderService
 {
     Task<ServiceResponse> CreateOrder();
     Task<ServiceResponse> GetOrders();
-    Task<ServiceResponse> GetOrderById(int orderId);
-    Task<ServiceResponse> UpdateOrderToReturn(int orderId);
-    Task<ServiceResponse> UpdateOrderToCancel(int orderId);
+    Task<ServiceResponse> GetOrderById(Guid orderId, CancellationToken cancellationToken = default);
+    Task<ServiceResponse> UpdateOrderToReturn(Guid orderId, CancellationToken cancellationToken = default);
+    Task<ServiceResponse> UpdateOrderToCancel(Guid orderId, CancellationToken cancellationToken = default);
 }

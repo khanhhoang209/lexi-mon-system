@@ -373,6 +373,7 @@ namespace LexiMon.Repository.Migrations
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Level = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
+                    Exp = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     HelmetUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ArmorUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     WeaponUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -659,6 +660,7 @@ namespace LexiMon.Repository.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
                     LessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Exp = table.Column<int>(type: "int", nullable: false),
                     IsStudied = table.Column<bool>(type: "bit", nullable: false),
                     CustomLessonId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Status = table.Column<bool>(type: "bit", nullable: false),
@@ -720,9 +722,9 @@ namespace LexiMon.Repository.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "Address", "BirthDate", "ConcurrencyStamp", "CreatedAt", "DeletedAt", "Email", "EmailConfirmed", "FirstName", "Gender", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "Status", "TwoFactorEnabled", "UpdatedAt", "UserName" },
                 values: new object[,]
                 {
-                    { "5d7efb6d-0d52-4159-ab2e-7fd356973925", 0, null, null, "5c209fe1-afda-48c9-b781-f14c736cb1f6", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com", true, null, 3, null, false, null, "FREE@EXAMPLE.COM", "FREE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEJwZS3Bcblg86jlB1ZUAu4W6GWFTx9LqO2RiNAuOHSh6nfLSMYH2841Jq6OHyGOcvQ==", null, false, "82f60efe-da50-48cc-bcf1-078004ff78ec", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com" },
-                    { "88f1581b-4f4e-4831-8cf8-ee4afed04c11", 0, null, null, "afff19bc-cd39-475c-ac83-462592eef802", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com", true, null, 3, null, false, null, "ADMIN@EXAMPLE.COM", "ADMIN@EXAMPLE.COM", "AQAAAAIAAYagAAAAEPzRv43rVQq30mniakQ80RwckLc53Zrv52S2HpJkR4sPntM2WKbjy91IxWjcGeAwfQ==", null, false, "81c295bd-ab3c-4cee-b3ab-c8cb41e5d3e0", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com" },
-                    { "c2765f80-383f-46f2-9a73-ec47863100ae", 0, null, null, "2fb057d3-7615-47d5-94ec-0b8ab8d1f9d2", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com", true, null, 3, null, false, null, "PREMIUM@EXAMPLE.COM", "PREMIUM@EXAMPLE.COM", "AQAAAAIAAYagAAAAEPtW3sUG2LJofhZfeRmoc0PNY1Du2JAZOQK+cDsNiT16MM+DbhaKDqFsAD+VkqcsCA==", null, false, "c9089da7-6131-45e7-9883-ea4746dc51de", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com" }
+                    { "5d7efb6d-0d52-4159-ab2e-7fd356973925", 0, null, null, "ff4e658b-9c3c-47b0-a7e6-a0bb8f836c44", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com", true, null, 3, null, false, null, "FREE@EXAMPLE.COM", "FREE@EXAMPLE.COM", "AQAAAAIAAYagAAAAEL/1dak3fp5fmJ44jQVVozMDPyL0Bq34Gflk/BD2xq3TRwvhomTkN1Wbgfp6APvsDw==", null, false, "e0de6ccc-67df-4b21-8804-cdff6c6aac2d", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "free@example.com" },
+                    { "88f1581b-4f4e-4831-8cf8-ee4afed04c11", 0, null, null, "2646f226-917e-4b57-bb47-e2dc4ff6ea71", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com", true, null, 3, null, false, null, "ADMIN@EXAMPLE.COM", "ADMIN@EXAMPLE.COM", "AQAAAAIAAYagAAAAED8SHvNvyB2p3GtVWLOCuZQ8otA1KdcD/UHj/dVYtkG4ymdS2n5KBgKZF8SbAetPSw==", null, false, "6835b010-4e2c-4b8e-9be1-936562df5563", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "admin@example.com" },
+                    { "c2765f80-383f-46f2-9a73-ec47863100ae", 0, null, null, "3830b34e-89e8-4b79-abdc-81e246b9fc16", new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com", true, null, 3, null, false, null, "PREMIUM@EXAMPLE.COM", "PREMIUM@EXAMPLE.COM", "AQAAAAIAAYagAAAAEMKLqGgdzCvQPjuB4pAkOC3oaRdrNy1D5zu795uVKAX/1yEd1MDs4AAkCeejsK4g0w==", null, false, "9b735209-669e-4ac4-8760-5d695fa01676", true, false, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "premium@example.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -733,6 +735,15 @@ namespace LexiMon.Repository.Migrations
                     { "3631e38b-60dd-4d1a-af7f-a26f21c2ef82", "5d7efb6d-0d52-4159-ab2e-7fd356973925" },
                     { "37a7c5df-4898-4fd4-8e5f-d2abd4b57520", "88f1581b-4f4e-4831-8cf8-ee4afed04c11" },
                     { "51ef7e08-ff07-459b-8c55-c7ebac505103", "c2765f80-383f-46f2-9a73-ec47863100ae" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Character",
+                columns: new[] { "Id", "ArmorUrl", "BootUrl", "CreatedAt", "DeletedAt", "HelmetUrl", "Level", "Name", "Status", "UpdatedAt", "UserId", "WeaponUrl" },
+                values: new object[,]
+                {
+                    { new Guid("02988a47-b638-4dc0-ae56-90920d847534"), null, null, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, 1, "User Premium Character", true, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "c2765f80-383f-46f2-9a73-ec47863100ae", null },
+                    { new Guid("260159a7-b6ec-4339-80da-c9ebc3cd8aa1"), null, null, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), null, 1, "User Free Character", true, new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)), "5d7efb6d-0d52-4159-ab2e-7fd356973925", null }
                 });
 
             migrationBuilder.CreateIndex(
