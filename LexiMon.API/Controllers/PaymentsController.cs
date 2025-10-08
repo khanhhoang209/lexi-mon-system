@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using LexiMon.Service.Interfaces;
 using LexiMon.Service.Models.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Net.payOS.Types;
 
@@ -18,6 +19,7 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpPost("{orderId:Guid}")]
+    [Authorize(Roles = "Free")]
     public async Task<IResult> CreatePayment([FromRoute] Guid orderId,
         CancellationToken cancellationToken = default)
     {
@@ -36,6 +38,7 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpGet("return")]
+    // [Authorize(Roles = "Free")]
     public async Task<IResult> PaymentReturn([FromQuery] Guid orderId,
         CancellationToken cancellationToken = default)
     {
@@ -49,6 +52,7 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpGet("cancel")]
+    // [Authorize(Roles = "Free")]
     public async Task<IResult> PaymentCancel([FromQuery] Guid orderId,
         CancellationToken cancellationToken = default)
     {

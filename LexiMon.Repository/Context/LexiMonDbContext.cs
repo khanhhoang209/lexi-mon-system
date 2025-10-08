@@ -45,6 +45,9 @@ public class LexiMonDbContext : IdentityDbContext<ApplicationUser>, ILexiMonDbCo
 
         // Seed user roles
         modelBuilder.Entity<IdentityUserRole<string>>().HasData(SeedingUserRoles());
+
+        // Seed characters
+        modelBuilder.Entity<Character>().HasData(SeedingCharacters());
     }
 
     private ICollection<IdentityRole> SeedingRoles()
@@ -129,6 +132,31 @@ public class LexiMonDbContext : IdentityDbContext<ApplicationUser>, ILexiMonDbCo
                 { UserId = "c2765f80-383f-46f2-9a73-ec47863100ae", RoleId = "51ef7e08-ff07-459b-8c55-c7ebac505103" }, // premium
             new IdentityUserRole<string>
                 { UserId = "88f1581b-4f4e-4831-8cf8-ee4afed04c11", RoleId = "37a7c5df-4898-4fd4-8e5f-d2abd4b57520" } // admin
+        };
+    }
+
+    private ICollection<Character> SeedingCharacters()
+    {
+        return new List<Character>
+        {
+            new Character
+            {
+                Id = Guid.NewGuid(),
+                UserId = "5d7efb6d-0d52-4159-ab2e-7fd356973925",
+                Name = "User Free Character",
+                Level = 1,
+                Exp = 0,
+                Status = true
+            },
+            new Character
+            {
+                Id = Guid.NewGuid(),
+                UserId = "c2765f80-383f-46f2-9a73-ec47863100ae",
+                Name = "User Premium Character",
+                Level = 1,
+                Exp = 0,
+                Status = true
+            },
         };
     }
 }
