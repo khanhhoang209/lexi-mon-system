@@ -128,7 +128,12 @@ public class LevelRangeService : ILevelRangeService
         {
             query = query.Where(lr => lr.Name.Contains(request.Name));
         }
-
+        
+        if (request.IsActive.HasValue)
+        {
+            query = query.Where(e => e.Status == request.IsActive.Value);
+        }
+        
         var totalCount = query.Count();
 
         var levelRange = await query

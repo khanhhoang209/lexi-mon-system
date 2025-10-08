@@ -5,21 +5,21 @@ using Microsoft.AspNetCore.Mvc;
 namespace LexiMon.API.Controllers;
 
 [ApiController]
-[Route("api/enemy-levels")]
-public class EnemyLevelController : ControllerBase
+[Route("api/achievements")]
+public class AchievementsController : ControllerBase
 {
-    private readonly IEnemyLevelService _service;
-    public EnemyLevelController(IEnemyLevelService service)
+    private readonly IAchievementService _service;
+    public AchievementsController(IAchievementService service)
     {
         _service = service;
     }
     
-    [HttpPost]
+     [HttpPost]
     public async Task<IResult> CreateAsync(
-        [FromBody]  EnemyLevelRequestDto request,
+        [FromBody]  AchievementRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        var serviceResponse = await _service.CreateEnemyLevelAsync(request, cancellationToken);
+        var serviceResponse = await _service.CreateAchievementAsync(request, cancellationToken);
         if (serviceResponse.Succeeded)
         {
             return TypedResults.Created($"/api/animation-types/{serviceResponse.Data}", serviceResponse);
@@ -31,10 +31,10 @@ public class EnemyLevelController : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<IResult> UpdateAsync(
         [FromRoute] Guid id,
-        [FromBody] EnemyLevelRequestDto request,
+        [FromBody] AchievementRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        var serviceResponse = await _service.UpdateEnemyLevelAsync(id, request, cancellationToken);
+        var serviceResponse = await _service.UpdateAchievementAsync(id, request, cancellationToken);
         if (serviceResponse.Succeeded)
         {
             return TypedResults.Ok(serviceResponse);
@@ -48,7 +48,7 @@ public class EnemyLevelController : ControllerBase
         [FromRoute] Guid id, 
         CancellationToken cancellationToken = default)
     {
-        var serviceResponse = await _service.DeleteEnemyLevelAsync(id, cancellationToken);
+        var serviceResponse = await _service.DeleteAchievementAsync(id, cancellationToken);
         if (serviceResponse.Succeeded)
         {
             return TypedResults.NoContent();
@@ -62,7 +62,7 @@ public class EnemyLevelController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
-        var serviceResponse = await _service.GetEnemyLevelByIdAsync(id, cancellationToken);
+        var serviceResponse = await _service.GetAchievementByIdAsync(id, cancellationToken);
         if (!serviceResponse.Succeeded)
         {
             return TypedResults.BadRequest();
@@ -75,7 +75,7 @@ public class EnemyLevelController : ControllerBase
         [FromQuery] GetBaseRequest request, 
         CancellationToken cancellationToken = default)
     {
-        var serviceResponse = await _service.GetEnemyLevelsAsync(request, cancellationToken);
+        var serviceResponse = await _service.GetAchievementsAsync(request, cancellationToken);
         return Results.Ok(serviceResponse);
         
     }

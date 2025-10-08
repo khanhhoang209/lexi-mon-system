@@ -32,7 +32,7 @@ public static class CourseMapper
             ImageUrl = request.ImageUrl,
             Price = request.Price,
             Coin = request.Coin,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = DateTimeOffset.UtcNow,
             Status = true,
         };
     }
@@ -44,6 +44,6 @@ public static class CourseMapper
         course.ImageUrl = request.ImageUrl;
         course.Price = request.Price;
         course.Coin = request.Coin;
-        course.UpdatedAt = DateTime.UtcNow;
+        course.UpdatedAt = DateTimeOffset.UtcNow;
     }
 }

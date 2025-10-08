@@ -28,7 +28,8 @@ public static class LessonMapper
             Title = request.Title,
             Description = request.Description,
             CourseId = request.CourseId,
-            Status = true
+            Status = true,
+            CreatedAt = DateTimeOffset.UtcNow
         };
     }
 
@@ -37,5 +38,6 @@ public static class LessonMapper
         lesson.Title = request.Title;
         lesson.Description = request.Description;
         lesson.CourseId = request.CourseId;
+        lesson.UpdatedAt = DateTimeOffset.UtcNow;
     }
 }

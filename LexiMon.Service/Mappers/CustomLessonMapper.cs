@@ -25,7 +25,8 @@ public static class CustomLessonMapper
             Id = Guid.NewGuid(),
             Title = request.Title,
             Description = request.Description,
-            Status = true
+            Status = true,
+            CreatedAt = DateTimeOffset.UtcNow
         };
     }
 
@@ -33,5 +34,6 @@ public static class CustomLessonMapper
     {
         lesson.Title = request.Title;
         lesson.Description = request.Description;
+        lesson.UpdatedAt = DateTimeOffset.UtcNow;
     }
 }

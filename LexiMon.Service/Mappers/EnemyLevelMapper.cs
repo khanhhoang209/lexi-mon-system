@@ -26,7 +26,7 @@ public static class EnemyLevelMapper
             Name = request.Name,
             FromLevel = request.FromLevel,
             ToLevel = request.ToLevel,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = DateTimeOffset.UtcNow,
             Status = true,
         };
     }
@@ -36,6 +36,6 @@ public static class EnemyLevelMapper
         e.Name = request.Name;
         e.FromLevel = request.FromLevel;
         e.ToLevel = request.ToLevel;
-        e.UpdatedAt = DateTime.UtcNow;
+        e.UpdatedAt = DateTimeOffset.UtcNow;
     }
 }

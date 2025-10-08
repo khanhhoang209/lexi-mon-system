@@ -42,7 +42,7 @@ public static class EnemyMapper
             Quantity = request.Quantity,
             Description = request.Description,
             EnemyLevelId = request.EnemyLevelId,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = DateTimeOffset.UtcNow,
             Status = true,
         };
     }
@@ -60,6 +60,6 @@ public static class EnemyMapper
         enemy.Quantity = request.Quantity;
         enemy.Description = request.Description;
         enemy.EnemyLevelId = request.EnemyLevelId;
-        enemy.UpdatedAt = DateTime.UtcNow;
+        enemy.UpdatedAt = DateTimeOffset.UtcNow;
     }
 }
