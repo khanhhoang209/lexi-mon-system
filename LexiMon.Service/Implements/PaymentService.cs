@@ -42,6 +42,7 @@ public class PaymentService : IPaymentService
                 .Include(o => o.Item)
                 .Include(o => o.Course)
                 .FirstOrDefaultAsync(o => o.Id == requestBody.OrderId, cancellationToken);
+
             if (order == null)
             {
                 _logger.LogError("Order not found with OrderId: {OrderId}", requestBody.OrderId);
@@ -49,6 +50,16 @@ public class PaymentService : IPaymentService
                 {
                     Succeeded = false,
                     Message = "Không tìm thấy đơn hàng!"
+                };
+            }
+
+            if (order.PaymentStatus != PaymentStatus.Pending)
+            {
+                _logger.LogError("Order status is not valid with OrderId: {OrderId}", requestBody.OrderId);
+                return new ServiceResponse()
+                {
+                    Succeeded = false,
+                    Message = "Trạng thái đơn hàng không hợp lệ!"
                 };
             }
 
@@ -97,7 +108,7 @@ public class PaymentService : IPaymentService
                 Data = response
             };
         }
-        catch (Exception ex)
+        catch
         {
             _logger.LogError("Error creating payment link for OrderId: {OrderId}", requestBody.OrderId);
             return new ServiceResponse()
@@ -161,7 +172,7 @@ public class PaymentService : IPaymentService
                 Message = "Giao dịch thành công!"
             };
         }
-        catch (Exception ex)
+        catch
         {
             transaction.TransactionStatus = TransactionStatus.Fail;
             await _unitOfWork.GetRepository<Transaction, Guid>().UpdateAsync(transaction, cancellationToken);
@@ -227,7 +238,7 @@ public class PaymentService : IPaymentService
                 Message = "Hủy giao dịch thành công!"
             };
         }
-        catch (Exception ex)
+        catch
         {
             transaction.TransactionStatus = TransactionStatus.Fail;
             await _unitOfWork.GetRepository<Transaction, Guid>().UpdateAsync(transaction, cancellationToken);

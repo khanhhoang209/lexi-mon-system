@@ -64,9 +64,9 @@ public class OrderService : IOrderService
 
 
         }
-        catch (Exception e)
+        catch
         {
-            _logger.LogError(e, "CreateOrder failed");
+            _logger.LogError("CreateOrder failed");
             return new ServiceResponse { Succeeded = false, Message = "Create order failed!" };
         }
     }
@@ -146,7 +146,7 @@ public class OrderService : IOrderService
                 Message = "Thanh toán đơn hàng thành công!"
             };
         }
-        catch (Exception ex)
+        catch
         {
             order.PaymentStatus = PaymentStatus.Fail;
             await _unitOfWork.GetRepository<Order, Guid>().UpdateAsync(order, cancellationToken);
@@ -195,7 +195,7 @@ public class OrderService : IOrderService
                 Message = "Hủy đơn hàng thành công!"
             };
         }
-        catch (Exception ex)
+        catch
         {
             order.PaymentStatus = PaymentStatus.Fail;
             await _unitOfWork.GetRepository<Order, Guid>().UpdateAsync(order, cancellationToken);

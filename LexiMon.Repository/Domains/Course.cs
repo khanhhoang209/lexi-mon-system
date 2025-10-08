@@ -11,5 +11,5 @@ public class Course : BaseAuditableEntity<Guid>
     public decimal? Coin {get; set;}
     public ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
     public ICollection<UserDeck> UserDecks { get; set; } = new List<UserDeck>();
-    public Order? Order { get; set; } = null!;
+    public ICollection<Order>? Orders { get; set; } = new List<Order>();
 }
