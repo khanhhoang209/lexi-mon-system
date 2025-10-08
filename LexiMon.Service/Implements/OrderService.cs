@@ -83,7 +83,11 @@ public class OrderService : IOrderService
 
     public async Task<ServiceResponse> UpdateOrderToReturn(Guid orderId, CancellationToken cancellationToken = default)
     {
-        var order = await _unitOfWork.GetRepository<Order, Guid>().GetByIdAsync(orderId, cancellationToken);
+        var order = await _unitOfWork.GetRepository<Order, Guid>()
+            .Query()
+            .Include(o => o.Course)
+            .Include(o => o.Item)
+            .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
         if (order == null)
         {
             _logger.LogError("Order not found with OrderId: {OrderId}", orderId);
@@ -290,12 +294,12 @@ public class OrderService : IOrderService
             }
         }
         return new ServiceResponse { Succeeded = true, Message = "Validation passed." };
-        
+
     }
-    
+
     private sealed record PricingInfo(decimal? PurchaseCost, decimal? CoinCost);
     private async Task<PricingInfo?> ResolvePricingAsync(
-        OrderRequestDto request, 
+        OrderRequestDto request,
         CancellationToken ct)
     {
         if (request.ItemId.HasValue)
@@ -303,10 +307,10 @@ public class OrderService : IOrderService
             var itemRepo = _unitOfWork.GetRepository<Item, Guid>();
             var item = await itemRepo.GetByIdAsync(request.ItemId.Value, ct);
             if (item is null) return null;
-            
+
             return new PricingInfo(
                 PurchaseCost: item.Price,
-                CoinCost:     item.Coin   
+                CoinCost:     item.Coin
             );
         }
 
@@ -318,7 +322,7 @@ public class OrderService : IOrderService
 
             return new PricingInfo(
                 PurchaseCost: course.Price,
-                CoinCost:     course.Coin   
+                CoinCost:     course.Coin
             );
         }
 
