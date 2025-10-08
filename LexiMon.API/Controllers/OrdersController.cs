@@ -30,4 +30,17 @@ public class OrdersController : ControllerBase
       
       return TypedResults.Created($"/api/orders/{((ResponseData<Guid>)response).Data}", response);
   }
+    [HttpGet("users")]
+     public async Task<IResult> GetAllUsersOrders(
+         [FromQuery] GetOrderUserRequest request,
+         CancellationToken cancellationToken)
+     {
+         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                      ?? throw new Exception("User not found");
+         var response = await _service.GetAllUsersOrdersByUserId(request, userId, cancellationToken);
+         if (!response.Succeeded)
+           return TypedResults.BadRequest(response);
+         
+         return TypedResults.Ok(response);
+     }
 }
