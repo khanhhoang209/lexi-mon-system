@@ -69,6 +69,7 @@ public class Program
         builder.Services.AddScoped<ILevelRangeService, LevelRangeService>();
         builder.Services.AddScoped<IPaymentService, PaymentService>();
         builder.Services.AddScoped<IAchievementService, AchievementService>();
+        builder.Services.AddScoped<IOrderService, OrderService>();
         
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
