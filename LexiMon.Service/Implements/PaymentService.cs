@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using LexiMon.Repository.Domains;
+﻿using LexiMon.Repository.Domains;
 using LexiMon.Repository.Enum;
 using LexiMon.Repository.Interfaces;
 using LexiMon.Repository.Utils;
@@ -8,13 +6,11 @@ using LexiMon.Service.ApiResponse;
 using LexiMon.Service.Configs;
 using LexiMon.Service.Interfaces;
 using LexiMon.Service.Models.Requests;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Net.payOS;
 using Net.payOS.Types;
-using Newtonsoft.Json.Linq;
 using Transaction = LexiMon.Repository.Domains.Transaction;
 
 namespace LexiMon.Service.Implements;
@@ -37,14 +33,90 @@ public class PaymentService : IPaymentService
 
     public async Task<ServiceResponse> CreatePayment(PaymentRequest requestBody, CancellationToken cancellationToken = default)
     {
-        var orderRepo = _unitOfWork.GetRepository<Order, Guid>();
-        var order = await orderRepo.Query()
+        try
+        {
+            // Check existing order
+            var order = await _unitOfWork.GetRepository<Order, Guid>()
+                .Query()
                 .Include(o => o.Item)
                 .Include(o => o.Course)
                 .FirstOrDefaultAsync(o => o.Id == requestBody.OrderId, cancellationToken);
-        if (order == null)
+            if (order == null)
+            {
+                _logger.LogError("Order not found with OrderId: {OrderId}", requestBody.OrderId);
+                return new ServiceResponse()
+                {
+                    Succeeded = false,
+                    Message = "Không tìm thấy đơn hàng!"
+                };
+            }
+
+            // Information for payment
+            var itemName = "";
+            if (order.Item != null) itemName = order.Item.Name;
+            if (order.Course != null) itemName = order.Course.Title;
+            var orderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            var item = new ItemData(itemName, 1, (int)order.PurchaseCost!);
+            var items = new List<ItemData> { item };
+            var expiredAt = TimeConverter.GetCurrentVietNamTime().AddSeconds(_payOsSetings.ExpirationSeconds).ToUnixTimeSeconds();
+
+            var data = new PaymentData(
+                orderCode: orderCode,
+                amount: item.price,
+                description: "Thanh toán đơn hàng",
+                items: items,
+                returnUrl: $"{_payOsSetings.BaseUrl}/payments/return?orderId={order.Id}",
+                cancelUrl: $"{_payOsSetings.BaseUrl}/payments/cancel?orderId={order.Id}",
+                expiredAt: expiredAt
+            );
+            var response = await _payOs.createPaymentLink(data);
+
+            // Save transaction
+            var transaction = new Transaction()
+            {
+                OrderId = order.Id,
+                UserId = order.UserId,
+                OrderCode = orderCode,
+                PaymentLinkId = response.paymentLinkId,
+                CheckoutUrl = response.checkoutUrl,
+                QrCode = response.qrCode,
+                Amount = (decimal)order.PurchaseCost,
+                Description = data.description,
+                TransactionStatus = TransactionStatus.Pending,
+                PaymentMethod = PaymentMethod.PayOs,
+            };
+            await _unitOfWork.GetRepository<Transaction, Guid>().AddAsync(transaction, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("Transaction created successfully with OrderId: {OrderId}", transaction.OrderId);
+            return new ResponseData<CreatePaymentResult>()
+            {
+                Succeeded = true,
+                Message = "Tạo liên kết thanh toán thành công!",
+                Data = response
+            };
+        }
+        catch (Exception ex)
         {
-            _logger.LogError("Order not found: {OrderId}", requestBody.OrderId);
+            _logger.LogError(ex, "Error creating payment link for OrderId: {OrderId}", requestBody.OrderId);
+            return new ServiceResponse()
+            {
+                Succeeded = false,
+                Message = "Lỗi khi tạo liên kết thanh toán!"
+            };
+        }
+
+    }
+
+    public async Task<ServiceResponse> PaymentReturn(Guid orderId, CancellationToken cancellationToken = default)
+    {
+        var transaction = await _unitOfWork.GetRepository<Transaction, Guid>()
+            .Query()
+            .FirstOrDefaultAsync(t => t.OrderId == orderId, cancellationToken);
+
+        if (transaction == null)
+        {
+            _logger.LogError("Order not found with OrderId: {OrderId}", orderId);
             return new ServiceResponse()
             {
                 Succeeded = false,
@@ -52,77 +124,9 @@ public class PaymentService : IPaymentService
             };
         }
 
-        var itemName = "";
-        if (order.Item != null)
-        {
-            itemName = order.Item.Name;
-        }
-        if (order.Course != null)
-        {
-            itemName = order.Course.Title;
-        }
-
-        var orderCode = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        var item = new ItemData(itemName, 1, (int)order.PurchaseCost!);
-        var items = new List<ItemData> { item };
-        var expiredAt = TimeConverter.GetCurrentVietNamTime().AddSeconds(_payOsSetings.ExpirationSeconds).ToUnixTimeSeconds();
-
-        var data = new PaymentData(
-            orderCode: orderCode,
-            amount: item.price,
-            description: "Thanh toán đơn hàng",
-            items: items,
-            returnUrl: $"{_payOsSetings.BaseUrl}/payments/return?orderCode={orderCode}",
-            cancelUrl: $"{_payOsSetings.BaseUrl}/payments/cancel?orderCode={orderCode}",
-            expiredAt: expiredAt
-        );
-
-        var response = await _payOs.createPaymentLink(data);
-
-        var transactionRepo = _unitOfWork.GetRepository<Transaction, Guid>();
-        var transaction = new Transaction()
-        {
-            OrderId = order.Id,
-            UserId = order.UserId,
-            OrderCode = orderCode,
-            PaymentLinkId = response.paymentLinkId,
-            CheckoutUrl = response.checkoutUrl,
-            QrCode = response.qrCode,
-            Amount = (decimal)order.PurchaseCost,
-            Description = data.description,
-            TransactionStatus = TransactionStatus.Pending,
-            PaymentMethod = PaymentMethod.PayOs,
-        };
-        await transactionRepo.AddAsync(transaction, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        _logger.LogInformation("CreatePayment: {@data}", data);
-        return new ResponseData<CreatePaymentResult>()
-        {
-            Succeeded = true,
-            Message = "Tạo liên kết thanh toán thành công!",
-            Data = response
-        };
-    }
-
-    public async Task<ServiceResponse> PaymentReturn(long orderCode, CancellationToken cancellationToken = default)
-    {
-        var transactionRepo = _unitOfWork.GetRepository<Transaction, Guid>();
-        var transaction = await transactionRepo.Query()
-            .FirstOrDefaultAsync(t => t.OrderCode == orderCode, cancellationToken);
-
-        if (transaction == null) {
-            _logger.LogError("Order not found with OrderCode: {OrderCode}", orderCode);
-            return new ServiceResponse()
-            {
-                Succeeded = false,
-                Message = "Không tìm thấy giao dịch!"
-            };
-        }
-
         if (transaction.TransactionStatus != TransactionStatus.Pending)
         {
-            _logger.LogError("Payment return {@TransactionStatus}", transaction.TransactionStatus);
+            _logger.LogError("Transaction status not valid with {OrderId}", orderId);
             return new ServiceResponse()
             {
                 Succeeded = false,
@@ -130,35 +134,51 @@ public class PaymentService : IPaymentService
             };
         }
 
-        transaction.TransactionStatus = TransactionStatus.Return;
-        await transactionRepo.UpdateAsync(transaction, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Payment return success: {@transaction}", transaction);
-        return new ServiceResponse()
+        try
         {
-            Succeeded = true,
-            Message = "Thanh toán thành công!"
-        };
-    }
-
-    public async Task<ServiceResponse> PaymentCancel(long orderCode, CancellationToken cancellationToken = default)
-    {
-        var transactionRepo = _unitOfWork.GetRepository<Transaction, Guid>();
-        var transaction = await transactionRepo.Query()
-            .FirstOrDefaultAsync(t => t.OrderCode == orderCode, cancellationToken);
-
-        if (transaction == null) {
-            _logger.LogError("Order not found with OrderCode: {OrderId}", orderCode);
+            transaction.TransactionStatus = TransactionStatus.Return;
+            await _unitOfWork.GetRepository<Transaction, Guid>().UpdateAsync(transaction, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Payment return sucessfully with OrderId: {OrderId}", transaction.OrderId);
+            return new ServiceResponse()
+            {
+                Succeeded = true,
+                Message = "Giao dịch thành công!"
+            };
+        }
+        catch (Exception ex)
+        {
+            transaction.TransactionStatus = TransactionStatus.Fail;
+            await _unitOfWork.GetRepository<Transaction, Guid>().UpdateAsync(transaction, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Payment return fail with OrderId: {OrderId}", transaction.OrderId);
             return new ServiceResponse()
             {
                 Succeeded = false,
-                Message = "Không tìm thấy giao dịch!"
+                Message = "Giao dịch thất bại!"
+            };
+        }
+
+    }
+
+    public async Task<ServiceResponse> PaymentCancel(Guid orderId, CancellationToken cancellationToken = default)
+    {
+        var transaction = await _unitOfWork.GetRepository<Transaction, Guid>()
+            .Query()
+            .FirstOrDefaultAsync(t => t.OrderId == orderId, cancellationToken);
+
+        if (transaction == null) {
+            _logger.LogError("Order not found with OrderId: {OrderId}", orderId);
+            return new ServiceResponse()
+            {
+                Succeeded = false,
+                Message = "Không tìm thấy đơn hàng!"
             };
         }
 
         if (transaction.TransactionStatus != TransactionStatus.Pending)
         {
-            _logger.LogError("Payment return {@TransactionStatus}", transaction.TransactionStatus);
+            _logger.LogError("Transaction status not valid with {OrderId}", orderId);
             return new ServiceResponse()
             {
                 Succeeded = false,
@@ -166,14 +186,29 @@ public class PaymentService : IPaymentService
             };
         }
 
-        transaction.TransactionStatus = TransactionStatus.Return;
-        await transactionRepo.UpdateAsync(transaction, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Payment return success: {@transaction}", transaction);
-        return new ServiceResponse()
+        try
         {
-            Succeeded = true,
-            Message = "Hủy thanh toán thành công!"
-        };
+            transaction.TransactionStatus = TransactionStatus.Cancel;
+            await _unitOfWork.GetRepository<Transaction, Guid>().UpdateAsync(transaction, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Payment cancel sucessfully with OrderId: {OrderId}", transaction.OrderId);
+            return new ServiceResponse()
+            {
+                Succeeded = true,
+                Message = "Hủy giao dịch thành công!"
+            };
+        }
+        catch (Exception ex)
+        {
+            transaction.TransactionStatus = TransactionStatus.Fail;
+            await _unitOfWork.GetRepository<Transaction, Guid>().UpdateAsync(transaction, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Payment cancel fail with OrderId: {OrderId}", transaction.OrderId);
+            return new ServiceResponse()
+            {
+                Succeeded = false,
+                Message = "Giao dịch thất bại!"
+            };
+        }
     }
 }
