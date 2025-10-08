@@ -221,4 +221,67 @@ public class ItemService : IItemService
             Data = coursesResponse
         };
     }
+    public async Task<PaginatedResponse<ItemResponseDto>> GetShopItemsAsync(
+    string userId,
+    GetItemRequest request,
+    CancellationToken cancellationToken = default) 
+    {
+        var character = await _unitOfWork.GetRepository<Character, Guid>()
+            .Query()
+            .FirstOrDefaultAsync(c => c.UserId == userId, cancellationToken);
+
+        if (character == null)
+        {
+            _logger.LogWarning("Character not found for user {UserId}", userId);
+            return new PaginatedResponse<ItemResponseDto>
+            {
+                Succeeded = false,
+                Message = "Character not found"
+            };
+        }
+
+        var itemRepo = _unitOfWork.GetRepository<Item, Guid>()
+                                                    .Query().Include(i => i.Category);
+        var equipRepo = _unitOfWork.GetRepository<Equipment, (Guid, Guid)>().Query();
+
+        // chỉ lấy item mà user chưa sở hữu (NOT EXISTS)
+        var query = itemRepo
+            .Where(i => !equipRepo.Any(e => e.ItemId == i.Id && e.CharacterId == character.Id));
+
+        // Áp các filter hiện có
+        if (!string.IsNullOrEmpty(request.ItemName))
+            query = query.Where(i => i.Name.Contains(request.ItemName));
+
+        if (!string.IsNullOrEmpty(request.CategoryName))
+            query = query.Where(i => i.Category!.Name.Contains(request.CategoryName));
+
+        if (request.MinPrice != null && request.MaxPrice != null)
+            query = query.Where(i => (i.Price >= request.MinPrice && i.Price <= request.MaxPrice)
+                                  || (i.Coin  >= request.MinPrice && i.Coin  <= request.MaxPrice));
+        else if (request.MinPrice != null)
+            query = query.Where(i => i.Price >= request.MinPrice || i.Coin >= request.MinPrice);
+        else if (request.MaxPrice != null)
+            query = query.Where(i => i.Price <= request.MaxPrice || i.Coin <= request.MaxPrice);
+
+        
+        var totalCount = await query.CountAsync(cancellationToken);
+        var data = await query
+            .OrderByDescending(i => i.CreatedAt)
+            .Skip((request.Page - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .Select(i => i.ToItemResponse())
+            .ToListAsync(cancellationToken);
+
+        return new PaginatedResponse<ItemResponseDto>
+        {
+            Succeeded = true,
+            Message = "Shop items retrieved successfully",
+            TotalCount = totalCount,
+            PageNumber = request.Page,
+            PageSize = request.PageSize,
+            TotalPages = (int)Math.Ceiling((double)totalCount / request.PageSize),
+            Data = data
+        };
+    }
+
 }

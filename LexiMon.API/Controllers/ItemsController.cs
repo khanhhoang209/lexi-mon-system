@@ -1,5 +1,7 @@
-﻿using LexiMon.Service.Interfaces;
+﻿using System.Security.Claims;
+using LexiMon.Service.Interfaces;
 using LexiMon.Service.Models.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LexiMon.API.Controllers;
@@ -117,6 +119,18 @@ public class ItemsController : ControllerBase
         CancellationToken cancellationToken = default)
     {
         var serviceResponse = await _service.GetItemsAsync(request, cancellationToken);
+        return Results.Ok(serviceResponse);
+        
+    }
+    [HttpGet("shop")]
+    [Authorize]
+    public async Task<IResult> GetShopItemsAsync(
+        [FromQuery] GetItemRequest request, 
+        CancellationToken cancellationToken = default)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? throw new Exception("User not found");
+        var serviceResponse = await _service.GetShopItemsAsync(userId, request, cancellationToken);
         return Results.Ok(serviceResponse);
         
     }
