@@ -36,10 +36,10 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpGet("return")]
-    public async Task<IResult> PaymentReturn([FromQuery] long orderCode,
+    public async Task<IResult> PaymentReturn([FromQuery] Guid orderId,
         CancellationToken cancellationToken = default)
     {
-        var serviceResponse = await _paymentService.PaymentReturn(orderCode, cancellationToken);
+        var serviceResponse = await _paymentService.PaymentReturn(orderId, cancellationToken);
         if (serviceResponse.Succeeded)
         {
             return TypedResults.Ok(serviceResponse);
@@ -49,10 +49,10 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpGet("cancel")]
-    public async Task<IResult> PaymentCancel([FromQuery] long orderCode,
+    public async Task<IResult> PaymentCancel([FromQuery] Guid orderId,
         CancellationToken cancellationToken = default)
     {
-        var serviceResponse = await _paymentService.PaymentCancel(orderCode, cancellationToken);
+        var serviceResponse = await _paymentService.PaymentCancel(orderId, cancellationToken);
         if (serviceResponse.Succeeded)
         {
             return TypedResults.Ok(serviceResponse);
