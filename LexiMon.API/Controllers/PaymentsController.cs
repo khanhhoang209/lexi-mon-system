@@ -38,7 +38,7 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpGet("return")]
-    [Authorize(Roles = "Free")]
+    // [Authorize(Roles = "Free")]
     public async Task<IResult> PaymentReturn([FromQuery] Guid orderId,
         CancellationToken cancellationToken = default)
     {
@@ -52,7 +52,7 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpGet("cancel")]
-    [Authorize(Roles = "Free")]
+    // [Authorize(Roles = "Free")]
     public async Task<IResult> PaymentCancel([FromQuery] Guid orderId,
         CancellationToken cancellationToken = default)
     {
