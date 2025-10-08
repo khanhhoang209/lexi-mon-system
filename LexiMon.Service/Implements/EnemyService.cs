@@ -130,6 +130,11 @@ public class EnemyService : IEnemyService
             query = query.Where(e => e.Name.Contains(request.Name));
         }
 
+        if (request.IsActive.HasValue)
+        {
+            query = query.Where(e => e.Status == request.IsActive.Value);
+        }
+        
         var totalCount = query.Count();
         var enemies = await query
             .OrderByDescending(e => e.CreatedAt)

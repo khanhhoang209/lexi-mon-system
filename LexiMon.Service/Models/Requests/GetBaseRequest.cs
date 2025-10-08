@@ -11,4 +11,5 @@ public class GetBaseRequest
     public int PageSize { get; init; } = 8;
     
     public string Name {get; init;} = string.Empty;
+    public bool? IsActive { get; init; }
 }

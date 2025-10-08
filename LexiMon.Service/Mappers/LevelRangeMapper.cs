@@ -25,7 +25,8 @@ public static class LevelRangeMapper
         {
             Name = request.Name,
             FromExp = request.FromExp,
-            ToExp = request.ToExp
+            ToExp = request.ToExp,
+            CreatedAt = DateTimeOffset.UtcNow,
         };
     }
     
@@ -34,5 +35,6 @@ public static class LevelRangeMapper
         levelRange.Name = request.Name;
         levelRange.FromExp = request.FromExp;
         levelRange.ToExp = request.ToExp;
+        levelRange.UpdatedAt = DateTimeOffset.UtcNow;
     }
 }
