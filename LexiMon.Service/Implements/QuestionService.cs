@@ -14,13 +14,13 @@ public class QuestionService : IQuestionService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<QuestionService> _logger;
-    
+
     public QuestionService(IUnitOfWork unitOfWork, ILogger<QuestionService> logger)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
-    
+
     public async Task<ResponseData<List<Guid>>> CreateQuestionAnswerAsync(
         List<QuestionCreateRequestDto> requests,
         CancellationToken ct = default)
@@ -31,18 +31,18 @@ public class QuestionService : IQuestionService
             {
                 _logger.LogWarning("Emty request!!");
                 return new ResponseData<List<Guid>> { Succeeded = false, Message = "Empty request." };
-                            
+
             }
-         
-            var questionRepo = _unitOfWork.GetRepository<Question, Guid>(); 
+
+            var questionRepo = _unitOfWork.GetRepository<Question, Guid>();
             var lessonRepo = _unitOfWork.GetRepository<Lesson, Guid>();
             var customLessonRepo = _unitOfWork.GetRepository<CustomLesson, Guid>();
 
             var now = DateTimeOffset.UtcNow;
-            var toAdd = new List<Question>(); 
+            var toAdd = new List<Question>();
             foreach (var r in requests)
-            { 
-                var lessonId       = ParseGuidOrNull(r.LessonId); 
+            {
+                var lessonId       = ParseGuidOrNull(r.LessonId);
                 var customLessonId = ParseGuidOrNull(r.CustomLessonId);
 
             // validate owner (y hệt Create hiện tại)
@@ -52,7 +52,7 @@ public class QuestionService : IQuestionService
                 {
                     _logger.LogWarning($"Lesson with id {lessonId} not found!");
                     return new  ResponseData<List<Guid>> { Succeeded = false, Message = $"Lesson with id {lessonId} not found!" };
-                                
+
                 }
             }
             else if (customLessonId is not null)
@@ -74,10 +74,11 @@ public class QuestionService : IQuestionService
 
             var questionId = Guid.NewGuid();
             var question = new Question
-            { 
+            {
                 Id = questionId,
                 Content = r.Content.Trim(),
                 LessonId = lessonId,
+                Exp = 100,
                 CustomLessonId = customLessonId,
                 IsStudied = false,
                 CreatedAt = now,
@@ -87,10 +88,10 @@ public class QuestionService : IQuestionService
                     QuestionId = questionId,
                     Content = a.Content.Trim(),
                     IsCorrect = a.IsCorrect,
-                    CreatedAt = now, 
+                    CreatedAt = now,
                     Status = true
                 }).ToList()
-            }; 
+            };
             toAdd.Add(question);
             }
 
@@ -99,8 +100,8 @@ public class QuestionService : IQuestionService
 
             _logger.LogInformation("Questions created successfully");
             return new ResponseData<List<Guid>>
-            { 
-                Succeeded = true, 
+            {
+                Succeeded = true,
                 Message = "Questions created successfully!",
                 Data = toAdd.Select(x => x.Id).ToList()
             };
@@ -116,20 +117,20 @@ public class QuestionService : IQuestionService
         }
     }
 
-   
+
     public async Task<ServiceResponse> UpdateQuestionReplaceAsync(
         Guid id, QuestionUpdateRequestDto req, CancellationToken ct = default)
     {
         var qRepo = _unitOfWork.GetRepository<Question, Guid>();
         var aRepo = _unitOfWork.GetRepository<Answer, Guid>();
-        
+
         var question = await qRepo.GetByIdAsync(id, ct);
         if (question is null)
         {
             _logger.LogWarning($"Question with id {id} not found!");
             return new ServiceResponse { Succeeded = false, Message = "Question not found!" };
         }
-            
+
 
         var now = DateTimeOffset.UtcNow;
         question.Content   = req.Content.Trim();
@@ -137,7 +138,7 @@ public class QuestionService : IQuestionService
         question.UpdatedAt = now;
 
         // XÓA  mọi Answer thuộc question TRỰC TIẾP TRÊN DB
-        await aRepo.Query()                      
+        await aRepo.Query()
             .Where(a => a.QuestionId == id)
             .ExecuteDeleteAsync(ct);
 
@@ -148,7 +149,7 @@ public class QuestionService : IQuestionService
             QuestionId = id,
             Content    = x.Content.Trim(),
             IsCorrect  = x.IsCorrect,
-            Status     = true,        
+            Status     = true,
             CreatedAt  = now
         }).ToList();
 
@@ -175,13 +176,13 @@ public class QuestionService : IQuestionService
         {
             _logger.LogWarning($"Question with id {id} not found!");
             return new ServiceResponse
-            { 
-                Succeeded = false, 
+            {
+                Succeeded = false,
                 Message = "Question not found!"
             };
         }
-          
-        
+
+
         await questionRepo.RemoveAsync(question, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Questions deleted successfully!");
@@ -227,7 +228,7 @@ public class QuestionService : IQuestionService
                 Message = "Question not found!"
             };
         }
-          
+
 
         _logger.LogInformation("Questions retrieved successfully!");
         return new ResponseData<QuestionResponseDto>()
@@ -239,7 +240,7 @@ public class QuestionService : IQuestionService
     }
 
     public async Task<PaginatedResponse<QuestionLessonResponseDto>> GetQuestionsByLessonIdAsync(
-        Guid lessonId, 
+        Guid lessonId,
         GetQuestionRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -254,7 +255,7 @@ public class QuestionService : IQuestionService
                 Message = "Lesson not found!"
             };
         }
-        
+
         var questionRepo = _unitOfWork.GetRepository<Question, Guid>();
         var query = questionRepo.Query()
             .Where(q => q.LessonId == lessonId && q.Status == true)
@@ -262,9 +263,9 @@ public class QuestionService : IQuestionService
             .AsNoTracking();
         if(!string.IsNullOrEmpty(request.QuestionContent))
             query = query.Where(q => q.Content.Contains(request.QuestionContent));
-        
+
         var totalCount = query.Count();
-        
+
         var questions = await query
             .OrderBy(q => q.CreatedAt)
             .Skip((request.Page - 1) * request.PageSize)
@@ -301,7 +302,7 @@ public class QuestionService : IQuestionService
     }
 
     public async Task<PaginatedResponse<QuestionCustomLessonResponseDto>> GetQuestionsByCustomLessonIdAsync(
-        Guid customLessonId, 
+        Guid customLessonId,
         GetQuestionRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -316,18 +317,18 @@ public class QuestionService : IQuestionService
                 Message = "Custom lesson not found!"
             };
         }
-        
+
         var questionRepo = _unitOfWork.GetRepository<Question, Guid>();
         var query = questionRepo.Query()
             .Where(q => q.CustomLessonId == customLessonId)
             .Include(q => q.Answers.Where(a => a.Status))
             .AsNoTracking();
-        
+
         if(!string.IsNullOrEmpty(request.QuestionContent))
             query = query.Where(q => q.Content.Contains(request.QuestionContent));
-        
+
         var totalCount = query.Count();
-        
+
         var questions = await query
             .OrderBy(q => q.CreatedAt)
             .Skip((request.Page - 1) * request.PageSize)
@@ -348,7 +349,7 @@ public class QuestionService : IQuestionService
                 }).ToList()
             })
             .ToListAsync(cancellationToken);
-        
+
         _logger.LogInformation("Questions retrieved successfully!");
         return new PaginatedResponse<QuestionCustomLessonResponseDto>()
         {
@@ -362,7 +363,7 @@ public class QuestionService : IQuestionService
 
         };
     }
-    
+
     #region Helper
     private static Guid? ParseGuidOrNull(string? value)
     {
@@ -372,4 +373,3 @@ public class QuestionService : IQuestionService
 
     #endregion
 }
-
