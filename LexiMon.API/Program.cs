@@ -68,7 +68,8 @@ public class Program
         builder.Services.AddScoped<IEnemyLevelService, EnemyLevelService>();
         builder.Services.AddScoped<ILevelRangeService, LevelRangeService>();
         builder.Services.AddScoped<IPaymentService, PaymentService>();
-
+        builder.Services.AddScoped<IAchievementService, AchievementService>();
+        
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

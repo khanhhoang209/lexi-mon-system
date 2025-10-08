@@ -131,7 +131,10 @@ public class EnemyLevelService : IEnemyLevelService
         {
             query = query.Where(x => x.Name.Contains(request.Name));
         }
-
+        if (request.IsActive.HasValue)
+        {
+            query = query.Where(e => e.Status == request.IsActive.Value);
+        }
         var totalCount = query.Count();
         
         var enemyLevels = await query
