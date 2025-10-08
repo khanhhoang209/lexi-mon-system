@@ -1,5 +1,6 @@
 ﻿using LexiMon.Service.ApiResponse;
 using LexiMon.Service.Models.Requests;
+using LexiMon.Service.Models.Responses;
 
 namespace LexiMon.Service.Interfaces;
 
@@ -12,4 +13,8 @@ public interface IOrderService
     Task<ServiceResponse> GetOrderById(Guid orderId, CancellationToken cancellationToken = default);
     Task<ServiceResponse> UpdateOrderToReturn(Guid orderId, CancellationToken cancellationToken = default);
     Task<ServiceResponse> UpdateOrderToCancel(Guid orderId, CancellationToken cancellationToken = default);
+    Task<PaginatedResponse<OrderUserResponseDto>> GetAllUsersOrdersByUserId(
+        GetOrderUserRequest request,
+        string userId, 
+        CancellationToken cancellationToken);
 }
