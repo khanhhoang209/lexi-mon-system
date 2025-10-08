@@ -20,13 +20,14 @@ public class PaymentService : IPaymentService
     private readonly PayOS _payOs;
     private readonly IUnitOfWork _unitOfWork;
     private readonly PayOsSetings _payOsSetings;
+    private readonly IOrderService _orderService;
     private readonly ILogger<PaymentService> _logger;
 
-
-    public PaymentService(IUnitOfWork unitOfWork, ILogger<PaymentService> logger, IOptions<PayOsSetings> payOsSetings)
+    public PaymentService(IUnitOfWork unitOfWork, ILogger<PaymentService> logger, IOptions<PayOsSetings> payOsSetings, IOrderService orderService)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
+        _orderService = orderService;
         _payOsSetings = payOsSetings.Value;
         _payOs = new PayOS(_payOsSetings!.ClientId, _payOsSetings.ApiKey, _payOsSetings.ChecksumKey);
     }
@@ -98,7 +99,7 @@ public class PaymentService : IPaymentService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating payment link for OrderId: {OrderId}", requestBody.OrderId);
+            _logger.LogError("Error creating payment link for OrderId: {OrderId}", requestBody.OrderId);
             return new ServiceResponse()
             {
                 Succeeded = false,
@@ -130,12 +131,26 @@ public class PaymentService : IPaymentService
             return new ServiceResponse()
             {
                 Succeeded = false,
-                Message = "Giao dịch không hợp lệ!"
+                Message = "Trạng thái giao dịch không hợp lệ!"
             };
         }
 
         try
         {
+            var orderResponse = await _orderService.UpdateOrderToReturn(transaction.OrderId, cancellationToken);
+            if (!orderResponse.Succeeded)
+            {
+                transaction.TransactionStatus = TransactionStatus.Fail;
+                await _unitOfWork.GetRepository<Transaction, Guid>().UpdateAsync(transaction, cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                _logger.LogInformation("Payment return fail with OrderId: {OrderId}", transaction.OrderId);
+                return new ServiceResponse()
+                {
+                    Succeeded = false,
+                    Message = "Giao dịch thất bại!"
+                };
+            }
+
             transaction.TransactionStatus = TransactionStatus.Return;
             await _unitOfWork.GetRepository<Transaction, Guid>().UpdateAsync(transaction, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -182,12 +197,26 @@ public class PaymentService : IPaymentService
             return new ServiceResponse()
             {
                 Succeeded = false,
-                Message = "Giao dịch không hợp lệ!"
+                Message = "Trạng thái giao dịch không hợp lệ!"
             };
         }
 
         try
         {
+            var orderResponse = await _orderService.UpdateOrderToCancel(transaction.OrderId, cancellationToken);
+            if (!orderResponse.Succeeded)
+            {
+                transaction.TransactionStatus = TransactionStatus.Fail;
+                await _unitOfWork.GetRepository<Transaction, Guid>().UpdateAsync(transaction, cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                _logger.LogInformation("Payment cancel fail with OrderId: {OrderId}", transaction.OrderId);
+                return new ServiceResponse()
+                {
+                    Succeeded = false,
+                    Message = "Giao dịch thất bại!"
+                };
+            }
+
             transaction.TransactionStatus = TransactionStatus.Cancel;
             await _unitOfWork.GetRepository<Transaction, Guid>().UpdateAsync(transaction, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

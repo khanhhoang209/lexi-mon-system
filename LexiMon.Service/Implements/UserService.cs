@@ -14,13 +14,15 @@ public class UserService : IUserService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ITokenRepository _tokenRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<UserService> _logger;
 
-    public UserService(UserManager<ApplicationUser> userManager, ITokenRepository tokenRepository, ILogger<UserService> logger)
+    public UserService(UserManager<ApplicationUser> userManager, ITokenRepository tokenRepository, IUnitOfWork unitOfWork, ILogger<UserService> logger)
     {
         _userManager = userManager;
         _tokenRepository = tokenRepository;
         _logger = logger;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<ServiceResponse> LoginAsync(LoginRequestDto requestBody)
@@ -107,6 +109,16 @@ public class UserService : IUserService
                 Message = "Không thể tạo tài khoản. Vui lòng thử lại!",
             };
         }
+
+        var character = new Character()
+        {
+            UserId = user.Id,
+            Name = user.FirstName ?? "Steve",
+            Level = 1,
+            Exp = 0,
+        };
+        await _unitOfWork.GetRepository<Character, Guid>().AddAsync(character);
+        await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("User {Email} registered successfully with role {Role}", requestBody.Email, role);
         return new ResponseData<string>()
