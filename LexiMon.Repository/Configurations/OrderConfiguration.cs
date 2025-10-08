@@ -27,13 +27,13 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(x => x.Item)
-            .WithOne(x => x.Order)
-            .HasForeignKey<Order>(x => x.ItemId)
+            .WithMany(x => x.Orders)
+            .HasForeignKey(x => x.ItemId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(x => x.Course)
-            .WithOne(x => x.Order)
-            .HasForeignKey<Order>(x => x.CourseId)
+            .WithMany(x => x.Orders)
+            .HasForeignKey(x => x.CourseId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.ConfigureAuditableProperties();
