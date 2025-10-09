@@ -29,7 +29,7 @@ public class OrderService : IOrderService
 
     public async Task<ServiceResponse> CreateOrder(OrderRequestDto request,
         string userId,
-        
+
         CancellationToken cancellationToken = default)
     {
         try
@@ -51,6 +51,34 @@ public class OrderService : IOrderService
             var pricing = await ResolvePricingAsync(request, cancellationToken);
             if (pricing is null)
                 return new ServiceResponse { Succeeded = false, Message = "Pricing not found!" };
+
+            if (pricing.CoinCost is > 0)
+            {
+                if (user.Coins < pricing.CoinCost)
+                {
+                    return new ServiceResponse
+                    {
+                        Succeeded = false,
+                        Message = "Không đủ xu để thực hiện giao dịch!"
+                    };
+                }
+
+                var priceOrder = request.ToOrder(userId, pricing.PurchaseCost, pricing.CoinCost);
+                priceOrder.PaymentStatus = PaymentStatus.Return;
+                priceOrder.PaidAt = TimeConverter.GetCurrentVietNamTime();
+                user.Coins -= (decimal) pricing.CoinCost;
+                await _userManager.UpdateAsync(user);
+                await _unitOfWork.GetRepository<Order, Guid>().AddAsync(priceOrder, cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                _logger.LogInformation("Order created successfully with Coin payment with OrderId: {OrderId}", priceOrder.Id);
+                return new ResponseData<Guid>()
+                {
+                    Succeeded = true,
+                    Message = "Order created successfully with Coin payment.",
+                    Data = priceOrder.Id
+                };
+            }
 
             var orderRepo = _unitOfWork.GetRepository<Order, Guid>();
             var order = request.ToOrder(userId, pricing.PurchaseCost, pricing.CoinCost);
@@ -289,7 +317,7 @@ public class OrderService : IOrderService
             _logger.LogError("CreateOrder: neither CourseId nor ItemId provided");
             return new ServiceResponse
             {
-                Succeeded = false, 
+                Succeeded = false,
                 Message = "Either CourseId or ItemId must be provided!"
             };
         }
@@ -299,7 +327,7 @@ public class OrderService : IOrderService
             _logger.LogError("CreateOrder: both CourseId and ItemId provided");
             return new ServiceResponse
             {
-                Succeeded = false, 
+                Succeeded = false,
                 Message = "Only one of CourseId or ItemId can be provided!"
             };
         }
@@ -315,7 +343,7 @@ public class OrderService : IOrderService
                 _logger.LogError("CreateOrder: Item {ItemId} not found", request.ItemId);
                 return new ServiceResponse
                 {
-                    Succeeded = false, 
+                    Succeeded = false,
                     Message = "Item not found!"
                 };
             }
@@ -330,12 +358,15 @@ public class OrderService : IOrderService
                         Message = "Only users with the premium role can purchase premium items."
                     };
                 }
-            } 
+            }
             var dupItem = await orderRepo.Query()
                 .AnyAsync(o => o.UserId == user.Id
                                && o.ItemId == request.ItemId
                                && (o.PaymentStatus == PaymentStatus.Pending || o.PaymentStatus == PaymentStatus.Return)
                 , ct);
+
+
+
             if (dupItem)
             {
                 _logger.LogError("CreateOrder: Item {ItemId} already purchased (pending or paid) by user {UserId}", request.ItemId, user.Id);
