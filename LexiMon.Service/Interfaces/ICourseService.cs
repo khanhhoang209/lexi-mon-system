@@ -26,4 +26,9 @@ public interface ICourseService
     Task<PaginatedResponse<CourseResponseDto>> GetCoursesAsync(
         GetCourseRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<PaginatedResponse<CourseResponseDto>> GetShopCoursesAsync(
+        string userId,
+        GetCourseRequest request,
+        CancellationToken cancellationToken = default);
 }

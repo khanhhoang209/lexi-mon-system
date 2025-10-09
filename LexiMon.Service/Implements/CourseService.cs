@@ -164,6 +164,54 @@ public class CourseService : ICourseService
             TotalPages = (int)Math.Ceiling((double)totalCourses / request.PageSize),
             Data = coursesResponse
         };
-  
     }
+    
+    public async Task<PaginatedResponse<CourseResponseDto>> GetShopCoursesAsync(
+    string userId,
+    GetCourseRequest request,
+    CancellationToken cancellationToken = default)
+    {
+        
+        var courseQuery = _unitOfWork.GetRepository<Course, Guid>()
+                                            .Query().AsNoTracking().Where(c => c.Status);
+
+        var userDeckQ = _unitOfWork.GetRepository<UserDeck, Guid>()
+                                            .Query().AsNoTracking().Where(ud => ud.UserId == userId);
+        
+        var query = courseQuery.Where(c => !userDeckQ.Any(ud => ud.CourseId == c.Id));
+        
+
+        if (!string.IsNullOrWhiteSpace(request.Title))
+            query = query.Where(c => c.Title.Contains(request.Title));
+
+        if (request.MinPrice != null && request.MaxPrice != null)
+            query = query.Where(c =>
+                (c.Price >= request.MinPrice && c.Price <= request.MaxPrice) ||
+                (c.Coin  >= request.MinPrice && c.Coin  <= request.MaxPrice));
+        else if (request.MinPrice != null)
+            query = query.Where(c => c.Price >= request.MinPrice || c.Coin >= request.MinPrice);
+        else if (request.MaxPrice != null)
+            query = query.Where(c => c.Price <= request.MaxPrice || c.Coin <= request.MaxPrice);
+
+     
+        var total = await query.CountAsync(cancellationToken);
+        var data = await query
+            .OrderByDescending(c => c.CreatedAt)
+            .Skip((request.Page - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .Select(c => c.ToCourseResponse())
+            .ToListAsync(cancellationToken);
+
+        return new PaginatedResponse<CourseResponseDto>
+        {
+            Succeeded = true,
+            Message = "Shop courses retrieved successfully",
+            TotalCount = total,
+            PageNumber = request.Page,
+            PageSize = request.PageSize,
+            TotalPages = (int)Math.Ceiling((double)total / request.PageSize),
+            Data = data
+        };
+    }
+
 }
