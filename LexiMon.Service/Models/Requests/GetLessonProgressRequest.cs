@@ -13,12 +13,12 @@ public class GetLessonProgressRequest
 
     public LessonProgressStatus? LessonProgressStatus { get; init; } = null;
 
-    public int TargetValue { get; set; }
-    
-    public int CurrentValue { get; set; }
-    
+    public int TotalCount { get; set; }
+    public int CorrectCount { get; set; }
     public string? LessonName { get; set; }
     public string? CustomLessonTitle { get; set; }
+    public DateTimeOffset? FromDate { get; set; }
+    public DateTimeOffset? ToDate { get; set; }
 }
 
 public class GetLessonProgressByLessonIdRequest
@@ -31,9 +31,9 @@ public class GetLessonProgressByLessonIdRequest
 
     public LessonProgressStatus? LessonProgressStatus { get; init; } = null;
 
-    public int TargetValue { get; set; }
+    public int TotalCount { get; set; }
     
-    public int CurrentValue { get; set; }
+    public int CorrectCount { get; set; }
     
     public string? Title { get; set; }
 }

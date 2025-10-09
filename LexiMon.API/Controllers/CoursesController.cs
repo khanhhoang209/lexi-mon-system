@@ -1,5 +1,7 @@
-﻿using LexiMon.Service.Interfaces;
+﻿using System.Security.Claims;
+using LexiMon.Service.Interfaces;
 using LexiMon.Service.Models.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LexiMon.API.Controllers;
@@ -132,6 +134,17 @@ public class CoursesController : ControllerBase
             return NotFound(serviceResponse);
         }
 
+        return Ok(serviceResponse);
+    }
+    [HttpGet("shop")]
+    [Authorize]
+    public async Task<IActionResult> GetShopCoursesAsync(
+        [FromQuery] GetCourseRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                     ?? throw new Exception("User not found");
+        var serviceResponse = await _service.GetShopCoursesAsync(userId ,request, cancellationToken);
         return Ok(serviceResponse);
     }
 }

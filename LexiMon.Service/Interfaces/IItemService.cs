@@ -26,4 +26,9 @@ public interface IItemService
     Task<PaginatedResponse<ItemResponseDto>> GetItemsAsync(
         GetItemRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<PaginatedResponse<ItemResponseDto>> GetShopItemsAsync(
+        string userId,
+        GetItemRequest request,
+        CancellationToken cancellationToken = default);
 }
