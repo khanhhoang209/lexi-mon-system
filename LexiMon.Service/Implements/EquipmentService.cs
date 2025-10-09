@@ -3,6 +3,7 @@ using LexiMon.Repository.Interfaces;
 using LexiMon.Service.ApiResponse;
 using LexiMon.Service.Interfaces;
 using LexiMon.Service.Models.Responses;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -12,10 +13,16 @@ public class EquipmentService : IEquipmentService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<EquipmentService> _logger;
-    public EquipmentService(IUnitOfWork unitOfWork, ILogger<EquipmentService> logger)
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public EquipmentService(
+        IUnitOfWork unitOfWork, 
+        ILogger<EquipmentService> logger, 
+        UserManager<ApplicationUser> userManager)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
+        _userManager = userManager;
     }
     
     public async Task<PaginatedResponse<EquipmentResponseDto>> GetEquipmentsAsync(
@@ -23,6 +30,18 @@ public class EquipmentService : IEquipmentService
         GetEquipmentRequest request, 
         CancellationToken cancellationToken = default)
     {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            _logger.LogWarning("User not found");
+            return new PaginatedResponse<EquipmentResponseDto>()
+            {
+                Succeeded = false,
+                Message = "User not found",
+            };
+        }
+        
+        
         var repo = _unitOfWork.GetRepository<Equipment, (Guid, Guid)>();
         var query = repo.Query()
             .Include(e => e.Character)
@@ -58,7 +77,7 @@ public class EquipmentService : IEquipmentService
         return new PaginatedResponse<EquipmentResponseDto>()
         {
             Succeeded = true,
-            Message = "Courses retrieved successfully",
+            Message = "Item retrieved successfully",
             TotalCount = totalCount,
             PageNumber = request.Page,
             PageSize = request.PageSize,

@@ -51,18 +51,24 @@ public class LessonProgressService : ILessonProgressService
         {
             query = query.Where(lp => lp.LessonProgressStatus == request.LessonProgressStatus);
         }
-        if (request.TargetValue > 0)
-            query = query.Where(lp => lp.TargetValue == request.TargetValue);
+        if (request.CorrectCount > 0)
+            query = query.Where(lp => lp.CorrectCount == request.CorrectCount);
 
-        if (request.CurrentValue > 0)
-            query = query.Where(lp => lp.CurrentValue == request.CurrentValue);
+        if (request.TotalCount > 0)
+            query = query.Where(lp => lp.TotalCount == request.TotalCount);
 
         if (!string.IsNullOrWhiteSpace(request.LessonName))
             query = query.Where(lp => lp.Lesson!.Title.Contains(request.LessonName));
 
         if (!string.IsNullOrWhiteSpace(request.CustomLessonTitle))
             query = query.Where(lp => lp.CustomLesson!.Title.Contains(request.CustomLessonTitle));
-
+        
+        if (request.FromDate.HasValue)
+            query = query.Where(lp => lp.StartDate >= request.FromDate.Value);
+        
+        if (request.ToDate.HasValue)
+            query = query.Where(lp => lp.StartDate <= request.ToDate.Value);
+        
         var totalCount = query.Count();
         
         var response = await query
@@ -221,11 +227,11 @@ public class LessonProgressService : ILessonProgressService
         {
             query = query.Where(lp => lp.LessonProgressStatus == request.LessonProgressStatus);
         }
-        if (request.TargetValue > 0)
-            query = query.Where(lp => lp.TargetValue == request.TargetValue);
+        if (request.CorrectCount > 0)
+            query = query.Where(lp => lp.CorrectCount == request.CorrectCount);
 
-        if (request.CurrentValue > 0)
-            query = query.Where(lp => lp.CurrentValue == request.CurrentValue);
+        if (request.TotalCount > 0)
+            query = query.Where(lp => lp.TotalCount == request.TotalCount);
 
         if (!string.IsNullOrWhiteSpace(request.Title))
             query = query.Where(lp => lp.Lesson!.Title.Contains(request.Title));
@@ -279,11 +285,11 @@ public class LessonProgressService : ILessonProgressService
         {
             query = query.Where(lp => lp.LessonProgressStatus == request.LessonProgressStatus);
         }
-        if (request.TargetValue > 0)
-            query = query.Where(lp => lp.TargetValue == request.TargetValue);
+        if (request.CorrectCount > 0)
+            query = query.Where(lp => lp.CorrectCount == request.CorrectCount);
 
-        if (request.CurrentValue > 0)
-            query = query.Where(lp => lp.CurrentValue == request.CurrentValue);
+        if (request.TotalCount > 0)
+            query = query.Where(lp => lp.TotalCount == request.TotalCount);
 
         if (!string.IsNullOrWhiteSpace(request.Title))
             query = query.Where(lp => lp.CustomLesson!.Title.Contains(request.Title));

@@ -7,8 +7,9 @@ public class LessonProgress : BaseAuditableEntity<Guid>
 {
     public string UserId { get; set; } = null!;
     public ApplicationUser User { get; set; } = null!;
-    public int TargetValue { get; set; }
-    public int CurrentValue { get; set; }
+    public int CorrectCount  { get; set; }
+    public int TotalCount  { get; set; }
+    public int? TimeSpentSeconds { get; set; }
     public LessonProgressStatus LessonProgressStatus {get; set;}
     public DateTimeOffset? StartDate { get; set; }
     public DateTimeOffset? EndDate { get; set; }

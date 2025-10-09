@@ -12,8 +12,9 @@ public static class LessonProgressMapper
         return new LessonProgressResponseDto()
         {
             LessonProgressId = lp.Id,
-            CurrentValue = lp.CurrentValue,
-            TargetValue = lp.TargetValue,
+            CorrectCount = lp.CorrectCount,
+            TotalCount = lp.TotalCount,
+            TimeSpentFormatted = FormatTimeSpent(lp.TimeSpentSeconds),
             LessonProgressStatus = lp.LessonProgressStatus,
             StartDate = lp.StartDate,
             EndDate = lp.EndDate,
@@ -31,8 +32,9 @@ public static class LessonProgressMapper
         {
             Id = Guid.NewGuid(),
             UserId = userId,
-            TargetValue = request.TargetValue,
-            CurrentValue = request.CurrentValue,
+            CorrectCount = request.CorrectCount,
+            TotalCount = request.TotalCount,
+            TimeSpentSeconds = request.TimeSpentSeconds,
             LessonProgressStatus = LessonProgressStatus.InProgress,
             StartDate = request.StartDate,
             EndDate = request.EndDate,
@@ -45,11 +47,21 @@ public static class LessonProgressMapper
 
     public static void UpdateLessonProgress(this LessonProgress lp, LessonProgressRequestDto request)
     {
-        lp.TargetValue = request.TargetValue;
-        lp.CurrentValue = request.CurrentValue;
+        lp.CorrectCount = request.CorrectCount;
+        lp.TotalCount = request.TotalCount;
+        lp.TimeSpentSeconds = request.TimeSpentSeconds;
         lp.LessonProgressStatus = request.LessonProgressStatus;
         lp.EndDate = request.EndDate;
         lp.StartDate = request.StartDate;
         lp.UpdatedAt = DateTimeOffset.UtcNow;
     }
+    public static string FormatTimeSpent(int? seconds)
+    {
+        if (seconds is null || seconds <= 0)
+            return "00:00";
+
+        TimeSpan time = TimeSpan.FromSeconds(seconds.Value);
+        return $"{(int)time.TotalMinutes:D2}:{time.Seconds:D2}";
+    }
+
 }
