@@ -38,4 +38,10 @@ public interface ILessonProgressService
         Guid customLessonId,
         GetLessonProgressByLessonIdRequest request,
         CancellationToken cancellationToken = default);
+    Task<ResponseData<LessonProgressResponseDto>> GetLessonProgressByLessonId(
+        Guid lessonId,
+        CancellationToken cancellationToken = default);
+    Task<ResponseData<LessonProgressResponseDto>> GetLessonProgressByCustomLessonId(
+        Guid customLessonId,
+        CancellationToken cancellationToken = default);
 }
