@@ -314,4 +314,62 @@ public class LessonProgressService : ILessonProgressService
             Data = response
         };
     }
+    public async Task<ResponseData<LessonProgressResponseDto>> GetLessonProgressByLessonId(
+        Guid lessonId, 
+        CancellationToken cancellationToken = default)
+    {
+        var repo = _unitOfWork.GetRepository<LessonProgress, Guid>();
+        var lessonProgress =  await repo.Query()
+            .Include(lp => lp.Lesson)
+                .ThenInclude(l => l!.Course)
+            .Include(lp => lp.CustomLesson)
+            .FirstOrDefaultAsync(lp => lp.LessonId == lessonId, cancellationToken);
+        if (lessonProgress == null)
+        {
+            _logger.LogWarning("No lesson progress with lesson id {lessonId}", lessonId);
+            return new ResponseData<LessonProgressResponseDto>()
+            {
+                Succeeded = false,
+                Message = $"Lesson with id {lessonId} not found"
+            };
+        }
+
+        var response = lessonProgress.ToLessonProgressResponse();
+        _logger.LogInformation("Get lesson progress with lesson id {lessonId}", lessonId);
+        return new ResponseData<LessonProgressResponseDto>()
+        {
+            Succeeded = true,
+            Message = "Lesson Progress retrieved successfully",
+            Data = response
+        };
+    }
+    public async Task<ResponseData<LessonProgressResponseDto>> GetLessonProgressByCustomLessonId(
+        Guid customLessonId, 
+        CancellationToken cancellationToken = default)
+    {
+        var repo = _unitOfWork.GetRepository<LessonProgress, Guid>();
+        var lessonProgress =  await repo.Query()
+            .Include(lp => lp.Lesson)
+            .ThenInclude(l => l!.Course)
+            .Include(lp => lp.CustomLesson)
+            .FirstOrDefaultAsync(lp => lp.CustomLessonId == customLessonId, cancellationToken);
+        if (lessonProgress == null)
+        {
+            _logger.LogWarning("No lesson progress with custom lesson id {customLessonId}", customLessonId);
+            return new ResponseData<LessonProgressResponseDto>()
+            {
+                Succeeded = false,
+                Message = $"Custom Lesson with id {customLessonId} not found"
+            };
+        }
+
+        var response = lessonProgress.ToLessonProgressResponse();
+        _logger.LogInformation("Get lesson progress with custom lesson id {customLessonId}", customLessonId);
+        return new ResponseData<LessonProgressResponseDto>()
+        {
+            Succeeded = true,
+            Message = "Lesson Progress retrieved successfully",
+            Data = response
+        };
+    }
 }

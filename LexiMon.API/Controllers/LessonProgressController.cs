@@ -79,7 +79,24 @@ public class LessonProgressController : ControllerBase
 
         return Ok(result);
     }
+    [HttpGet("lesson/{id:guid}")]
+    public async Task<IActionResult> GetLessonProgressByLessonId(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _service.GetLessonProgressByLessonId(id, cancellationToken);
+        if (!result.Succeeded)
+            return NotFound(result);
 
+        return Ok(result);
+    }
+    [HttpGet("custom-lesson/{id:guid}")]
+    public async Task<IActionResult> GetLessonProgressByCustomLessonId(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _service.GetLessonProgressByCustomLessonId(id, cancellationToken);
+        if (!result.Succeeded)
+            return NotFound(result);
+
+        return Ok(result);
+    }
     
 
 }
