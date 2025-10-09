@@ -5,8 +5,10 @@ namespace LexiMon.Service.Models.Responses;
 public class LessonProgressResponseDto
 {
     public Guid LessonProgressId {get; set;}
-    public int TargetValue { get; set; }
-    public int CurrentValue { get; set; }
+    public int CorrectCount  { get; set; }
+    public int TotalCount  { get; set; }
+    
+    public string? TimeSpentFormatted { get; set; }
     public LessonProgressStatus LessonProgressStatus {get; set;}
     public DateTimeOffset? StartDate { get; set; }
     public DateTimeOffset? EndDate { get; set; }

@@ -29,6 +29,7 @@ public class OrderService : IOrderService
 
     public async Task<ServiceResponse> CreateOrder(OrderRequestDto request,
         string userId,
+        
         CancellationToken cancellationToken = default)
     {
         try
@@ -40,7 +41,7 @@ public class OrderService : IOrderService
                 return new ServiceResponse { Succeeded = false, Message = "User not found!" };
             }
 
-            var validationResponse = await ValidateAndResolveTargetAsync(request, userId, cancellationToken);
+            var validationResponse = await ValidateAndResolveTargetAsync(request, user, cancellationToken);
             if (!validationResponse.Succeeded)
             {
                 return validationResponse;
@@ -277,7 +278,7 @@ public class OrderService : IOrderService
     /// </summary>
     private async Task<ServiceResponse> ValidateAndResolveTargetAsync(
         OrderRequestDto request,
-        string userId,                 
+        ApplicationUser user,
         CancellationToken ct)
     {
         var hasCourse = request.CourseId.HasValue;
@@ -318,16 +319,26 @@ public class OrderService : IOrderService
                     Message = "Item not found!"
                 };
             }
-
-            // 2) Trùng theo user + item (chặn khi Pending or Return)
+            if (item.IsPremium)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                if (!roles.Contains("Premium"))
+                {
+                    return new ServiceResponse
+                    {
+                        Succeeded = false,
+                        Message = "Only users with the premium role can purchase premium items."
+                    };
+                }
+            } 
             var dupItem = await orderRepo.Query()
-                .AnyAsync(o => o.UserId == userId
+                .AnyAsync(o => o.UserId == user.Id
                                && o.ItemId == request.ItemId
                                && (o.PaymentStatus == PaymentStatus.Pending || o.PaymentStatus == PaymentStatus.Return)
                 , ct);
             if (dupItem)
             {
-                _logger.LogError("CreateOrder: Item {ItemId} already purchased (pending or paid) by user {UserId}", request.ItemId, userId);
+                _logger.LogError("CreateOrder: Item {ItemId} already purchased (pending or paid) by user {UserId}", request.ItemId, user.Id);
                 return new ServiceResponse { Succeeded = false, Message = "Item already purchased (pending or paid)!" };
             }
         }
@@ -343,13 +354,13 @@ public class OrderService : IOrderService
 
             //Trùng user + course (chặn Pending or Return)
             var dupCourse = await orderRepo.Query()
-                .AnyAsync(o => o.UserId == userId
+                .AnyAsync(o => o.UserId == user.Id
                             && o.CourseId == request.CourseId
                             && (o.PaymentStatus == PaymentStatus.Pending || o.PaymentStatus == PaymentStatus.Return)
                     , ct);
             if (dupCourse)
             {
-                _logger.LogError("CreateOrder: Course {CourseId} already purchased (pending or paid) by user {UserId}", request.CourseId, userId);
+                _logger.LogError("CreateOrder: Course {CourseId} already purchased (pending or paid) by user {UserId}", request.CourseId, user.Id);
                 return new ServiceResponse { Succeeded = false, Message = "Course already purchased (pending or paid)!" };
             }
         }
