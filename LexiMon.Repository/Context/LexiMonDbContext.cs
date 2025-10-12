@@ -48,6 +48,12 @@ public class LexiMonDbContext : IdentityDbContext<ApplicationUser>, ILexiMonDbCo
 
         // Seed characters
         modelBuilder.Entity<Character>().HasData(SeedingCharacters());
+
+        // Seed categories
+        modelBuilder.Entity<Category>().HasData(SeedingCategories());
+
+        // Seed items
+        modelBuilder.Entity<Item>().HasData(SeedingItems());
     }
 
     private ICollection<IdentityRole> SeedingRoles()
@@ -141,7 +147,7 @@ public class LexiMonDbContext : IdentityDbContext<ApplicationUser>, ILexiMonDbCo
         {
             new Character
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Parse("bfc27875-fba8-4e0b-a6d0-e5caa591abf5"),
                 UserId = "5d7efb6d-0d52-4159-ab2e-7fd356973925",
                 Name = "User Free Character",
                 Level = 1,
@@ -150,13 +156,42 @@ public class LexiMonDbContext : IdentityDbContext<ApplicationUser>, ILexiMonDbCo
             },
             new Character
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.Parse("c661f028-9f2a-4c10-a7c7-503d977c4092"),
                 UserId = "c2765f80-383f-46f2-9a73-ec47863100ae",
                 Name = "User Premium Character",
                 Level = 1,
                 Exp = 0,
                 Status = true
             },
+        };
+    }
+
+    private ICollection<Category> SeedingCategories()
+    {
+        return new List<Category>
+        {
+            new Category()
+            {
+                Id = Guid.Parse("a6368fa8-5017-4de2-a15c-719546923a1d"),
+                Name = Constants.Categories.PremiumPackage
+            }
+        };
+    }
+
+    private ICollection<Item> SeedingItems()
+    {
+        return new List<Item>
+        {
+            new Item()
+            {
+                Id = Guid.Parse("083e0832-47a5-449a-9c60-5f61db49140d"),
+                CategoryId = Guid.Parse("a6368fa8-5017-4de2-a15c-719546923a1d"),
+                Name = "Premium Package",
+                Description = "A package that unlocks all premium features and content.",
+                Price = 49000,
+                IsPremium = false,
+                Status = true,
+            }
         };
     }
 }
