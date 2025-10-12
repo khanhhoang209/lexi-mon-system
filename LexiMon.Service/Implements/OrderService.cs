@@ -1,3 +1,4 @@
+using LexiMon.Repository.Constants;
 using LexiMon.Repository.Domains;
 using LexiMon.Repository.Enum;
 using LexiMon.Repository.Interfaces;
@@ -143,7 +144,7 @@ public class OrderService : IOrderService
         var order = await _unitOfWork.GetRepository<Order, Guid>()
             .Query()
             .Include(o => o.Course)
-            .Include(o => o.Item)
+            .Include(o => o.Item).ThenInclude(o => o!.Category)
             .FirstOrDefaultAsync(o => o.Id == orderId, cancellationToken);
         if (order == null)
         {
@@ -182,16 +183,35 @@ public class OrderService : IOrderService
 
             if (order.Item != null)
             {
-                var character = await _unitOfWork.GetRepository<Character, Guid>()
-                    .Query()
-                    .FirstOrDefaultAsync(c => c.UserId == order.UserId, cancellationToken);
-
-                var equipment = new Equipment()
+                if (Categories.PremiumPackage == order.Item.Category!.Name)
                 {
-                    CharacterId = character!.Id,
-                    ItemId = (Guid)order.ItemId!,
-                };
-                await _unitOfWork.GetRepository<Equipment, (Guid, Guid)>().AddAsync(equipment, cancellationToken);
+                    var user = await _userManager.FindByIdAsync(order.UserId);
+                    if (user != null)
+                    {
+                        var roles = await _userManager.GetRolesAsync(user);
+                        if (!roles.Contains(Roles.Premium))
+                        {
+                            await _userManager.RemoveFromRoleAsync(user, Roles.Free);
+                            await _userManager.AddToRoleAsync(user, Roles.Premium);
+                            user.PremiumUntil = TimeConverter.GetCurrentVietNamTime().AddMonths(1);
+                            await _userManager.UpdateAsync(user);
+                            _logger.LogInformation("User {UserId} upgraded to Premium role after purchasing Premium Package", user.Id);
+                        }
+                    }
+                }
+                else
+                {
+                    var character = await _unitOfWork.GetRepository<Character, Guid>()
+                        .Query()
+                        .FirstOrDefaultAsync(c => c.UserId == order.UserId, cancellationToken);
+
+                    var equipment = new Equipment()
+                    {
+                        CharacterId = character!.Id,
+                        ItemId = (Guid)order.ItemId!,
+                    };
+                    await _unitOfWork.GetRepository<Equipment, (Guid, Guid)>().AddAsync(equipment, cancellationToken);
+                }
             }
 
             await _unitOfWork.GetRepository<Order, Guid>().UpdateAsync(order, cancellationToken);

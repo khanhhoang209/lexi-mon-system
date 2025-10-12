@@ -13,6 +13,7 @@ public class ApplicationUser : IdentityUser, IBaseAuditableEntity
     public DateTimeOffset? BirthDate { get; set; }
     public decimal Coins { get; set; } = 0;
     public Gender Gender { get; set; } = Gender.Other;
+    public DateTimeOffset PremiumUntil { get; set; } = DateTimeOffset.MinValue;
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
     public DateTimeOffset DeletedAt { get; set; }
