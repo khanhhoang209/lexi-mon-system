@@ -69,6 +69,33 @@ public class OrderService : IOrderService
                 user.Coins -= (decimal) pricing.CoinCost;
                 await _userManager.UpdateAsync(user);
                 await _unitOfWork.GetRepository<Order, Guid>().AddAsync(priceOrder, cancellationToken);
+                
+                // Update UserDeck if course is purchased
+                if (priceOrder.Course != null)
+                {
+                    var userDeck = new UserDeck()
+                    {
+                        UserId = priceOrder.UserId,
+                        CourseId = priceOrder.CourseId,
+                    };
+                    await _unitOfWork.GetRepository<UserDeck, Guid>().AddAsync(userDeck, cancellationToken);
+                }
+
+                // Update Equipment if item is purchased
+                if (priceOrder.Item != null)
+                {
+                    var character = await _unitOfWork.GetRepository<Character, Guid>()
+                        .Query()
+                        .FirstOrDefaultAsync(c => c.UserId == priceOrder.UserId, cancellationToken);
+
+                    var equipment = new Equipment()
+                    {
+                        CharacterId = character!.Id,
+                        ItemId = (Guid)priceOrder.ItemId!,
+                    };
+                    await _unitOfWork.GetRepository<Equipment, (Guid, Guid)>().AddAsync(equipment, cancellationToken);
+                }
+                
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 _logger.LogInformation("Order created successfully with Coin payment with OrderId: {OrderId}", priceOrder.Id);
