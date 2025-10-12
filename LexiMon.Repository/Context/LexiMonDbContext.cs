@@ -173,7 +173,8 @@ public class LexiMonDbContext : IdentityDbContext<ApplicationUser>, ILexiMonDbCo
             new Category()
             {
                 Id = Guid.Parse("a6368fa8-5017-4de2-a15c-719546923a1d"),
-                Name = Constants.Categories.PremiumPackage
+                Name = Constants.Categories.PremiumPackage,
+                Status = true
             }
         };
     }

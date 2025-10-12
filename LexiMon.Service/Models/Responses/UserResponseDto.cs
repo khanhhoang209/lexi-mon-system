@@ -13,4 +13,5 @@ public class UserResponseDto
     public DateTimeOffset? BirthDate { get; set; }
     public decimal Coins { get; set; }
     public Gender Gender { get; set; }
+    public DateTimeOffset PremiumUntil { get; set; }
 }
