@@ -77,6 +77,7 @@ public class Program
         builder.Services.AddScoped<IAchievementService, AchievementService>();
         builder.Services.AddScoped<IOrderService, OrderService>();
         builder.Services.AddScoped<IEquipmentService, EquipmentService>();
+        builder.Services.AddScoped<ICharacterService, CharacterService>();
         
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
