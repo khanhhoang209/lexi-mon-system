@@ -1,11 +1,13 @@
 ﻿using LexiMon.Repository.Domains;
 using LexiMon.Repository.Enum;
 using LexiMon.Repository.Interfaces;
+using LexiMon.Repository.Utils;
 using LexiMon.Service.ApiResponse;
 using LexiMon.Service.Interfaces;
 using LexiMon.Service.Models.Requests;
 using LexiMon.Service.Models.Responses;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace LexiMon.Service.Implements;
@@ -15,13 +17,15 @@ public class UserService : IUserService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ITokenRepository _tokenRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IUser _user;
     private readonly ILogger<UserService> _logger;
 
-    public UserService(UserManager<ApplicationUser> userManager, ITokenRepository tokenRepository, IUnitOfWork unitOfWork, ILogger<UserService> logger)
+    public UserService(UserManager<ApplicationUser> userManager, ITokenRepository tokenRepository, IUnitOfWork unitOfWork, ILogger<UserService> logger, IUser user)
     {
         _userManager = userManager;
         _tokenRepository = tokenRepository;
         _logger = logger;
+        _user = user;
         _unitOfWork = unitOfWork;
     }
 
@@ -126,6 +130,136 @@ public class UserService : IUserService
             Succeeded = true,
             Message = "Tạo tài khoản thành công!",
             Data = user.Id
+        };
+    }
+
+    public async Task<ServiceResponse> GetUserByIdAsync(CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(_user.Id!);
+
+        if (user == null)
+        {
+            _logger.LogError("User not found with ID: {UserId}", _user.Id);
+            return new ServiceResponse()
+            {
+                Succeeded = false,
+                Message = "Người dùng không tồn tại!",
+            };
+        }
+
+        var role = (await _userManager.GetRolesAsync(user))[0];
+
+        var response = new UserResponseDto()
+        {
+            Id = user.Id,
+            Email = user.Email!,
+            Role = role,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Address = user.Address,
+            BirthDate = user.BirthDate,
+            Coins = user.Coins,
+            Gender = user.Gender
+        };
+
+        _logger.LogInformation("User information retrieved successfully for ID: {UserId}", _user.Id);
+        return new ResponseData<UserResponseDto>()
+        {
+            Succeeded = true,
+            Message = "Lấy thông tin người dùng thành công!",
+            Data = response
+        };
+    }
+
+    public async Task<ServiceResponse> UpdateAsync(UserRequestDto requestBody,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(_user.Id!);
+
+        if (user == null)
+        {
+            _logger.LogError("User not found with ID: {UserId}", _user.Id);
+            return new ServiceResponse()
+            {
+                Succeeded = false,
+                Message = "Người dùng không tồn tại!",
+            };
+        }
+
+        user.FirstName = requestBody.FirstName;
+        user.LastName = requestBody.LastName;
+        user.Address = requestBody.Address;
+        user.BirthDate = requestBody.BirthDate;
+        user.Gender = requestBody.Gender;
+
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            _logger.LogError("Failed to update user with ID: {UserId}", _user.Id);
+            return new ServiceResponse()
+            {
+                Succeeded = false,
+                Message = "Cập nhật thông tin người dùng thất bại!",
+            };
+        }
+
+        _logger.LogInformation("User information updated successfully for ID: {UserId}", _user.Id);
+        return new ServiceResponse()
+        {
+            Succeeded = true,
+            Message = "Cập nhật thông tin người dùng thành công!",
+        };
+    }
+
+    public async Task<ServiceResponse> UpdateResourceAsync(UserResourseDto requestBody,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(_user.Id!);
+        if (user == null)
+        {
+            _logger.LogError("User not found with ID: {UserId}", _user.Id);
+            return new ServiceResponse()
+            {
+                Succeeded = false,
+                Message = "Người dùng không tồn tại!",
+            };
+        }
+
+        user.Coins += requestBody.Coins ?? 0;
+
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            _logger.LogError("Failed to update user resources with ID: {UserId}", _user.Id);
+            return new ServiceResponse()
+            {
+                Succeeded = false,
+                Message = "Cập nhật tài nguyên người dùng thất bại!",
+            };
+        }
+
+        var character = await _unitOfWork.GetRepository<Character, Guid>()
+            .Query()
+            .FirstOrDefaultAsync(c => c.UserId == _user.Id, cancellationToken);
+        if (character == null)
+        {
+            _logger.LogError("Character not found for user ID: {UserId}", _user.Id);
+            return new ServiceResponse()
+            {
+                Succeeded = false,
+                Message = "Nhân vật không tồn tại!",
+            };
+        }
+
+        character.Exp += requestBody.Exp ?? 0;
+
+        await _unitOfWork.GetRepository<Character, Guid>().UpdateAsync(character, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("User resources updated successfully for ID: {UserId}", _user.Id);
+        return new ServiceResponse()
+        {
+            Succeeded = true,
+            Message = "Cập nhật tài nguyên người dùng thành công!",
         };
     }
 }
