@@ -1,4 +1,5 @@
-﻿using LexiMon.Repository.Domains;
+﻿using LexiMon.Repository.Constants;
+using LexiMon.Repository.Domains;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -207,25 +208,25 @@ public class LexiMonDbContext : IdentityDbContext<ApplicationUser>, ILexiMonDbCo
             new CourseLanguage()
             {
                 Id = Guid.Parse("fc101062-1f47-4c71-8825-267148542026"),
-                Name = "Tiếng Anh",
+                Name = Languages.English,
                 Status = true
             },
             new CourseLanguage()
             {
                 Id = Guid.Parse("a45ac5e8-25c9-4c1d-9ba4-7d0b49d5601b"),
-                Name = "Tiếng Nhật",
+                Name = Languages.Japanese,
                 Status = true
             },
             new CourseLanguage()
             {
                 Id = Guid.Parse("0dcb03a7-5885-4611-a170-bd5ca18e9076"),
-                Name = "Tiếng Hàn",
+                Name = Languages.Korean,
                 Status = true
             },
             new CourseLanguage()
             {
                 Id = Guid.Parse("5c98c202-bfce-418b-8820-d3727793659f"),
-                Name = "Tiếng Trung",
+                Name = Languages.Chinese,
                 Status = true
             }
         };
