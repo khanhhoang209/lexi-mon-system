@@ -18,7 +18,9 @@ public static class CourseMapper
             Coin = course.Coin,
             CreatedAt = course.CreatedAt,
             UpdatedAt = course.UpdatedAt,
-            IsActive = course.Status
+            IsActive = course.Status,
+            CourseLanguageId = course.CourseLanguageId,
+            CourseLanguageName = course.CourseLanguage!.Name
         };
     }
 
@@ -34,6 +36,7 @@ public static class CourseMapper
             Coin = request.Coin,
             CreatedAt = DateTimeOffset.UtcNow,
             Status = true,
+            CourseLanguageId = request.CourseLanguageId,
         };
     }
 
@@ -44,6 +47,7 @@ public static class CourseMapper
         course.ImageUrl = request.ImageUrl;
         course.Price = request.Price;
         course.Coin = request.Coin;
+        course.CourseLanguageId = request.CourseLanguageId;
         course.UpdatedAt = DateTimeOffset.UtcNow;
     }
 }

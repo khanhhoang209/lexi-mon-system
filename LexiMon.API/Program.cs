@@ -79,6 +79,7 @@ public class Program
         builder.Services.AddScoped<IEquipmentService, EquipmentService>();
         builder.Services.AddScoped<ICharacterService, CharacterService>();
         builder.Services.AddScoped<IDashboardService, DashboardService>();
+        builder.Services.AddScoped<ICourseLanguageService, CourseLanguageService>();
 
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));

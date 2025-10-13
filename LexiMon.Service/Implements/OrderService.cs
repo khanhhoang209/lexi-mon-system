@@ -324,10 +324,13 @@ public class OrderService : IOrderService
             query = query.Where(o => o.CreatedAt >= request.FromDate);
         else if (request.ToDate.HasValue)
             query = query.Where(o => o.CreatedAt <= request.ToDate);
-
+        
+        if(request.IsActive.HasValue)
+            query = query.Where(a => a.Status == request.IsActive.Value);
         var totalCount = query.Count();
         var response = await query
-            .OrderByDescending(o => o.CreatedAt)
+            .OrderByDescending(o => o.Status)
+            .ThenByDescending(o => o.CreatedAt)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(o => o.ToOrderUserResponse())

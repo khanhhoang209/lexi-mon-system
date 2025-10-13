@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using LexiMon.Service.Implements;
 using LexiMon.Service.Interfaces;
+using LexiMon.Service.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LexiMon.API.Controllers;
