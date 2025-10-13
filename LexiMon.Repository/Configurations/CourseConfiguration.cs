@@ -26,7 +26,9 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
         builder.Property(x => x.Coin)
             .HasPrecision(18, 2)
             .IsRequired(false);
-
-
+        builder.HasOne(x => x.CourseLanguage)
+            .WithMany(x => x.Courses)
+            .HasForeignKey(x => x.CourseLanguageId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

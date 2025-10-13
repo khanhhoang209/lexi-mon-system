@@ -25,4 +25,5 @@ public interface ILexiMonDbContext
     DbSet<Order> Orders { get; }
     DbSet<Question> Questions { get; }
     DbSet<UserDeck> UserDecks { get; }
+    DbSet<CourseLanguage> CourseLanguages { get; }
 }
