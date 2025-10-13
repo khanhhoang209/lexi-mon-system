@@ -159,7 +159,8 @@ public class UserService : IUserService
             Address = user.Address,
             BirthDate = user.BirthDate,
             Coins = user.Coins,
-            Gender = user.Gender
+            Gender = user.Gender,
+            PremiumUntil = user.PremiumUntil
         };
 
         _logger.LogInformation("User information retrieved successfully for ID: {UserId}", _user.Id);

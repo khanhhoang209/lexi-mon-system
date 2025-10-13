@@ -27,10 +27,10 @@ public class CourseService : ICourseService
     {
         var repo = _unitOfWork.GetRepository<Course, Guid>();
         var course = request.ToCourse();
-        
+
         await repo.AddAsync(course, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
+
         return new ResponseData<Guid>
         {
             Succeeded = true,
@@ -55,7 +55,7 @@ public class CourseService : ICourseService
                 Message = $"Course with id {id} not found"
             };
         }
-        
+
         course.UpdateCourse(request);
         await repo.UpdateAsync(course, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -81,7 +81,7 @@ public class CourseService : ICourseService
                 Message = $"Course with id {id} not found"
             };
         }
-        
+
         await repo.RemoveAsync(course, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Course with id: {id} deleted successfully", id);
@@ -99,7 +99,7 @@ public class CourseService : ICourseService
         var course = await repo.GetByIdAsync(id, cancellationToken);
         if (course == null)
         {
-            
+
             _logger.LogWarning("Course with id: {id} not found", id);
             return new ResponseData<CourseResponseDto>
             {
@@ -109,7 +109,7 @@ public class CourseService : ICourseService
         }
 
         var response = course.ToCourseResponse();
-        
+
         _logger.LogInformation("Course with id: {id} retrieved successfully", id);
         return new ResponseData<CourseResponseDto>
         {
@@ -125,9 +125,9 @@ public class CourseService : ICourseService
     {
         var repo = _unitOfWork.GetRepository<Course, Guid>();
 
-        var query = repo.Query() // 
+        var query = repo.Query() //
             .AsNoTracking();
-        
+
         if (!string.IsNullOrWhiteSpace(request.Title))
         {
             query = query.Where(c => c.Title.Contains(request.Title));
@@ -149,7 +149,8 @@ public class CourseService : ICourseService
         
         var totalCourses = query.Count();
         var coursesResponse = await query
-            .OrderByDescending(c => c.CreatedAt)
+            .OrderByDescending(c => c.Status)
+            .ThenByDescending(c => c.CreatedAt)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(c => c.ToCourseResponse())
@@ -167,21 +168,21 @@ public class CourseService : ICourseService
             Data = coursesResponse
         };
     }
-    
+
     public async Task<PaginatedResponse<CourseResponseDto>> GetShopCoursesAsync(
     string userId,
     GetCourseRequest request,
     CancellationToken cancellationToken = default)
     {
-        
+
         var courseQuery = _unitOfWork.GetRepository<Course, Guid>()
                                             .Query().AsNoTracking().Where(c => c.Status);
 
         var userDeckQ = _unitOfWork.GetRepository<UserDeck, Guid>()
                                             .Query().AsNoTracking().Where(ud => ud.UserId == userId);
-        
+
         var query = courseQuery.Where(c => !userDeckQ.Any(ud => ud.CourseId == c.Id));
-        
+
 
         if (!string.IsNullOrWhiteSpace(request.Title))
             query = query.Where(c => c.Title.Contains(request.Title));
@@ -195,7 +196,7 @@ public class CourseService : ICourseService
         else if (request.MaxPrice != null)
             query = query.Where(c => c.Price <= request.MaxPrice || c.Coin <= request.MaxPrice);
 
-     
+
         var total = await query.CountAsync(cancellationToken);
         var data = await query
             .OrderByDescending(c => c.CreatedAt)

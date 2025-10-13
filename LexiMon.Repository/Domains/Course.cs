@@ -9,7 +9,10 @@ public class Course : BaseAuditableEntity<Guid>
     public string? ImageUrl { get; set; }
     public decimal? Price { get; set; }
     public decimal? Coin {get; set;}
+    public Guid CourseLanguageId { get; set; }
     public ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
     public ICollection<UserDeck> UserDecks { get; set; } = new List<UserDeck>();
     public ICollection<Order>? Orders { get; set; } = new List<Order>();
+    public CourseLanguage? CourseLanguage { get; set; } = null;
+
 }

@@ -31,6 +31,7 @@ public class LexiMonDbContext : IdentityDbContext<ApplicationUser>, ILexiMonDbCo
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<Question> Questions => Set<Question>();
     public DbSet<UserDeck> UserDecks => Set<UserDeck>();
+    public DbSet<CourseLanguage> CourseLanguages => Set<CourseLanguage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -54,6 +55,9 @@ public class LexiMonDbContext : IdentityDbContext<ApplicationUser>, ILexiMonDbCo
 
         // Seed items
         modelBuilder.Entity<Item>().HasData(SeedingItems());
+
+        // Seed course languages
+        modelBuilder.Entity<CourseLanguage>().HasData(SeedingLanguages());
     }
 
     private ICollection<IdentityRole> SeedingRoles()
@@ -173,7 +177,8 @@ public class LexiMonDbContext : IdentityDbContext<ApplicationUser>, ILexiMonDbCo
             new Category()
             {
                 Id = Guid.Parse("a6368fa8-5017-4de2-a15c-719546923a1d"),
-                Name = Constants.Categories.PremiumPackage
+                Name = Constants.Categories.PremiumPackage,
+                Status = true
             }
         };
     }
@@ -191,6 +196,37 @@ public class LexiMonDbContext : IdentityDbContext<ApplicationUser>, ILexiMonDbCo
                 Price = 49000,
                 IsPremium = false,
                 Status = true,
+            }
+        };
+    }
+
+    private ICollection<CourseLanguage> SeedingLanguages()
+    {
+        return new List<CourseLanguage>
+        {
+            new CourseLanguage()
+            {
+                Id = Guid.Parse("fc101062-1f47-4c71-8825-267148542026"),
+                Name = "Tiếng Anh",
+                Status = true
+            },
+            new CourseLanguage()
+            {
+                Id = Guid.Parse("a45ac5e8-25c9-4c1d-9ba4-7d0b49d5601b"),
+                Name = "Tiếng Nhật",
+                Status = true
+            },
+            new CourseLanguage()
+            {
+                Id = Guid.Parse("0dcb03a7-5885-4611-a170-bd5ca18e9076"),
+                Name = "Tiếng Hàn",
+                Status = true
+            },
+            new CourseLanguage()
+            {
+                Id = Guid.Parse("5c98c202-bfce-418b-8820-d3727793659f"),
+                Name = "Tiếng Trung",
+                Status = true
             }
         };
     }
