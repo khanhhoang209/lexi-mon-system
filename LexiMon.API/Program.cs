@@ -78,7 +78,8 @@ public class Program
         builder.Services.AddScoped<IOrderService, OrderService>();
         builder.Services.AddScoped<IEquipmentService, EquipmentService>();
         builder.Services.AddScoped<ICharacterService, CharacterService>();
-        
+        builder.Services.AddScoped<IDashboardService, DashboardService>();
+
         // Register repositories
         builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
