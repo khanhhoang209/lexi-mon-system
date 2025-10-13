@@ -73,7 +73,7 @@ public class AnimationTypesController : ControllerBase
 
     [HttpGet]
     public async Task<IResult> GetAllAsync(
-        [FromQuery] GetAnimationTypeRequest request, 
+        [FromQuery] GetBaseRequest request, 
         CancellationToken cancellationToken = default)
     {
         var serviceResponse = await _service.GetAllAnimationTypesAsync(request, cancellationToken);

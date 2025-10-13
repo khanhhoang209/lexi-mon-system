@@ -15,4 +15,5 @@ public class GetOrderUserRequest
     public string? Name { get; set; }
     public DateTimeOffset? FromDate { get; set; }
     public DateTimeOffset? ToDate { get; set; }
+    public bool? IsActive { get; init; }
 }

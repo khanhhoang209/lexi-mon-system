@@ -19,6 +19,7 @@ public class GetLessonProgressRequest
     public string? CustomLessonTitle { get; set; }
     public DateTimeOffset? FromDate { get; set; }
     public DateTimeOffset? ToDate { get; set; }
+    public bool? IsActive { get; init; }
 }
 
 public class GetLessonProgressByLessonIdRequest
@@ -36,4 +37,5 @@ public class GetLessonProgressByLessonIdRequest
     public int CorrectCount { get; set; }
     
     public string? Title { get; set; }
+    public bool? IsActive { get; init; }
 }

@@ -144,6 +144,8 @@ public class CourseService : ICourseService
         {
             query = query.Where(c => c.Price <= request.MaxPrice || c.Coin <= request.MaxPrice);
         }
+        if(request.IsActive.HasValue)
+            query = query.Where(a => a.Status == request.IsActive.Value);
         
         var totalCourses = query.Count();
         var coursesResponse = await query

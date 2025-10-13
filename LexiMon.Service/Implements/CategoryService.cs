@@ -108,7 +108,8 @@ public class CategoryService : ICategoryService
         
         if (!string.IsNullOrEmpty(request.Name))
             query = query.Where(c => c.Name!.Contains(request.Name));
-        
+        if(request.IsActive.HasValue)
+            query = query.Where(a => a.Status == request.IsActive.Value);
         var total = query.Count();
         var response = await query
             .Skip((request.Page - 1) * request.PageSize)

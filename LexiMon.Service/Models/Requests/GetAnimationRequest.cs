@@ -12,4 +12,5 @@ public class GetAnimationRequest
     public string AnimationName {get; init;} = string.Empty;
     public string AnimationTypeName {get; init;} = string.Empty;
     public string ItemName {get; init;} = string.Empty;
+    public bool? IsActive { get; init; }
 }
