@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace LexiMon.Service.Implements;
+namespace LexiMon.Service.Models.Requests;
 
 public class GetEquipmentRequest
 {

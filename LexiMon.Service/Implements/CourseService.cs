@@ -25,6 +25,19 @@ public class CourseService : ICourseService
         CourseRequestDto request,
         CancellationToken cancellationToken = default)
     {
+        
+        var courseLanguageRepo = _unitOfWork.GetRepository<CourseLanguage, Guid>();
+        var courseLanguage = await courseLanguageRepo.GetByIdAsync(request.CourseLanguageId, cancellationToken);
+        if (courseLanguage == null)
+        {
+            _logger.LogWarning("Course language with id: {id} not found", request.CourseLanguageId);
+            return new ResponseData<Guid>
+            {
+                Succeeded = false,
+                Message = $"Course language with id {request.CourseLanguageId} not found"
+            };
+        }
+        
         var repo = _unitOfWork.GetRepository<Course, Guid>();
         var course = request.ToCourse();
 
@@ -55,7 +68,18 @@ public class CourseService : ICourseService
                 Message = $"Course with id {id} not found"
             };
         }
-
+        var courseLanguageRepo = _unitOfWork.GetRepository<CourseLanguage, Guid>();
+        var courseLanguage = await courseLanguageRepo.GetByIdAsync(request.CourseLanguageId, cancellationToken);
+        if (courseLanguage == null)
+        {
+            _logger.LogWarning("Course language with id: {id} not found", request.CourseLanguageId);
+            return new ResponseData<Guid>
+            {
+                Succeeded = false,
+                Message = $"Course language with id {request.CourseLanguageId} not found"
+            };
+        }
+        
         course.UpdateCourse(request);
         await repo.UpdateAsync(course, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -96,7 +120,9 @@ public class CourseService : ICourseService
         Guid id, CancellationToken cancellationToken = default)
     {
         var repo = _unitOfWork.GetRepository<Course, Guid>();
-        var course = await repo.GetByIdAsync(id, cancellationToken);
+        var course = await repo.Query().Include(c=> c.CourseLanguage)
+                                .Where(c => c.Id == id)
+                                .FirstOrDefaultAsync(cancellationToken);
         if (course == null)
         {
 
@@ -125,7 +151,7 @@ public class CourseService : ICourseService
     {
         var repo = _unitOfWork.GetRepository<Course, Guid>();
 
-        var query = repo.Query() //
+        var query = repo.Query().Include(c => c.CourseLanguage)
             .AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(request.Title))
@@ -176,7 +202,8 @@ public class CourseService : ICourseService
     {
 
         var courseQuery = _unitOfWork.GetRepository<Course, Guid>()
-                                            .Query().AsNoTracking().Where(c => c.Status);
+                                            .Query().Include(c=> c.CourseLanguage)
+                                            .AsNoTracking().Where(c => c.Status);
 
         var userDeckQ = _unitOfWork.GetRepository<UserDeck, Guid>()
                                             .Query().AsNoTracking().Where(ud => ud.UserId == userId);
