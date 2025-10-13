@@ -177,9 +177,13 @@ public class AnimationService : IAnimationService
         if(!string.IsNullOrEmpty(request.ItemName))
             query = query.Where(a => a.Item!.Name.Contains(request.ItemName));
 
+        if(request.IsActive.HasValue)
+            query = query.Where(a => a.Status == request.IsActive.Value);
+        
         var totalCount = query.Count();
         var response = await query
-            .OrderByDescending(a => a.CreatedAt)
+            .OrderByDescending(a => a.Status)
+            .ThenByDescending(c => c.CreatedAt)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(a => a.ToAnimationResponse())

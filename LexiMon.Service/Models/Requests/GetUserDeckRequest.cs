@@ -11,4 +11,5 @@ public class GetUserDeckRequest
     public int PageSize { get; init; } = 8;
     public string CourseTitle { get; init; } = string.Empty;
     public string CustomLessonTitle {get; set; } = string.Empty;
+    public bool? IsActive { get; init; }
 }

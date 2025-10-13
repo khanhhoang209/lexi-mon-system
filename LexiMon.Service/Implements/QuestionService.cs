@@ -263,11 +263,14 @@ public class QuestionService : IQuestionService
             .AsNoTracking();
         if(!string.IsNullOrEmpty(request.QuestionContent))
             query = query.Where(q => q.Content.Contains(request.QuestionContent));
-
+        
+        if(request.IsActive.HasValue)
+            query = query.Where(a => a.Status == request.IsActive.Value);
         var totalCount = query.Count();
 
         var questions = await query
-            .OrderBy(q => q.CreatedAt)
+            .OrderByDescending(q => q.Status)
+            .ThenByDescending(c => c.CreatedAt)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(q => new QuestionLessonResponseDto
@@ -326,11 +329,13 @@ public class QuestionService : IQuestionService
 
         if(!string.IsNullOrEmpty(request.QuestionContent))
             query = query.Where(q => q.Content.Contains(request.QuestionContent));
-
+        if(request.IsActive.HasValue)
+            query = query.Where(a => a.Status == request.IsActive.Value);
         var totalCount = query.Count();
 
         var questions = await query
-            .OrderBy(q => q.CreatedAt)
+            .OrderByDescending(q => q.Status)
+            .ThenByDescending(q => q.CreatedAt)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(q => new QuestionCustomLessonResponseDto()

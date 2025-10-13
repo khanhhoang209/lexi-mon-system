@@ -128,21 +128,23 @@ public class AnimationTypeService : IAnimationTypeService
 
 
     public async Task<PaginatedResponse<AnimationTypeResponseDto>> GetAllAnimationTypesAsync(
-        GetAnimationTypeRequest request, 
+        GetBaseRequest request, 
         CancellationToken cancellationToken = default)
     {
         var repo = _unitOfWork.GetRepository<AnimationType, Guid>();
 
         var query = repo.Query().AsNoTracking();
 
-        if (!string.IsNullOrEmpty(request.AnimationTypeName))
-        {
-            query = query.Where(at => at.Name.Contains(request.AnimationTypeName));
-        }
+        if (!string.IsNullOrEmpty(request.Name))
+            query = query.Where(at => at.Name.Contains(request.Name));
 
+        if (request.IsActive.HasValue)
+            query = query.Where(at => at.Status == request.IsActive.Value);
+        
         var totalCount = query.Count();
         var respone = await query
-            .OrderByDescending(at => at.CreatedAt)
+            .OrderByDescending(at => at.Status)
+            .ThenByDescending(at => at.CreatedAt)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(at => new AnimationTypeResponseDto()

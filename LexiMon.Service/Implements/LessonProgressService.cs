@@ -69,6 +69,9 @@ public class LessonProgressService : ILessonProgressService
         if (request.ToDate.HasValue)
             query = query.Where(lp => lp.StartDate <= request.ToDate.Value);
         
+        if(request.IsActive.HasValue)
+            query = query.Where(a => a.Status == request.IsActive.Value);
+        
         var totalCount = query.Count();
         
         var response = await query
@@ -235,11 +238,15 @@ public class LessonProgressService : ILessonProgressService
 
         if (!string.IsNullOrWhiteSpace(request.Title))
             query = query.Where(lp => lp.Lesson!.Title.Contains(request.Title));
-
+        
+        if(request.IsActive.HasValue)
+            query = query.Where(a => a.Status == request.IsActive.Value);
+        
         var totalCount = query.Count();
         
         var response = await query
-            .OrderByDescending(lp => lp.CreatedAt)
+            .OrderByDescending(lp => lp.Status)
+            .ThenByDescending(lp => lp.CreatedAt)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(lp => lp.ToLessonProgressResponse())
@@ -293,11 +300,14 @@ public class LessonProgressService : ILessonProgressService
 
         if (!string.IsNullOrWhiteSpace(request.Title))
             query = query.Where(lp => lp.CustomLesson!.Title.Contains(request.Title));
-
+        
+        if(request.IsActive.HasValue)
+            query = query.Where(a => a.Status == request.IsActive.Value);
         var totalCount = query.Count();
         
         var response = await query
-            .OrderByDescending(lp => lp.CreatedAt)
+            .OrderByDescending(lp => lp.Status)
+            .ThenByDescending(lp => lp.CreatedAt)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(lp => lp.ToLessonProgressResponse())
