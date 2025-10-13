@@ -11,6 +11,7 @@ public class CourseRequestDto
     public string? ImageUrl { get; set; }
     public decimal? Price { get; set; }
     public decimal? Coin {get; set;}
+    public Guid CourseLanguageId { get; set; }
 }
 
 public class CourseCreateFormDto
@@ -24,4 +25,5 @@ public class CourseCreateFormDto
     [Range(0, double.MaxValue, ErrorMessage = "Số xu lớn hơn hoặc bằng 0!")]
     public decimal? Coin { get; set; }
     public IFormFile? Image { get; set; }
+    public Guid CourseLanguageId { get; set; }
 }

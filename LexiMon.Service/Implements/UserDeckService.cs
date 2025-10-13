@@ -43,10 +43,12 @@ public class UserDeckService : IUserDeckService
         
             if(!string.IsNullOrEmpty(request.CustomLessonTitle))
                 query = query.Where(ud => ud.CustomLesson!.Title.Contains(request.CustomLessonTitle));
-        
+            if(request.IsActive.HasValue)
+                query = query.Where(a => a.Status == request.IsActive.Value);
             var totalCourses = query.Count();
             var userDeckResponse = await query
-                .OrderByDescending(c => c.CreatedAt)
+                .OrderByDescending(c => c.Status)
+                .ThenByDescending(c => c.CreatedAt)
                 .Skip((request.Page - 1) * request.PageSize)
                 .Take(request.PageSize)
                 .Select(ud => ud.ToUserDeckResponse())

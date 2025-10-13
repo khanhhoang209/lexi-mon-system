@@ -165,11 +165,13 @@ public class LessonService : ILessonService
         {
             query = query.Where(l => l.Title.Contains(request.Title));
         }
-
+        if(request.IsActive.HasValue)
+            query = query.Where(a => a.Status == request.IsActive.Value);
         var totalLesson = query.Count();
         
         var lessonResponse = await query
-            .OrderByDescending(l => l.Title)
+            .OrderByDescending(l => l.Status)
+            .ThenByDescending(l => l.CreatedAt)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(l => l.ToLessonResponse())

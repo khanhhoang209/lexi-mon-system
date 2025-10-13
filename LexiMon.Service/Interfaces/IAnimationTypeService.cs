@@ -20,6 +20,6 @@ public interface IAnimationTypeService
         Guid id,
         CancellationToken cancellationToken = default);
     Task<PaginatedResponse<AnimationTypeResponseDto>> GetAllAnimationTypesAsync(
-        GetAnimationTypeRequest request,
+        GetBaseRequest request,
         CancellationToken cancellationToken = default);
 }

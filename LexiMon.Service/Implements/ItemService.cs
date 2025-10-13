@@ -199,11 +199,13 @@ public class ItemService : IItemService
         {
             query = query.Where(c => c.Price <= request.MaxPrice || c.Coin <= request.MaxPrice);
         }
-
+        if(request.IsActive.HasValue)
+            query = query.Where(a => a.Status == request.IsActive.Value);
         var totalCount = query.Count();
         
         var coursesResponse = await query
-            .OrderByDescending(c => c.CreatedAt)
+            .OrderByDescending(c => c.Status)
+            .ThenByDescending(c => c.CreatedAt)
             .Skip((request.Page - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(c => c.ToItemResponse())
@@ -241,7 +243,7 @@ public class ItemService : IItemService
         }
 
         var itemRepo = _unitOfWork.GetRepository<Item, Guid>()
-                                                    .Query().Include(i => i.Category);
+                                                    .Query().Include(i => i.Category).Where(c => c.Status);;
         var equipRepo = _unitOfWork.GetRepository<Equipment, (Guid, Guid)>().Query();
 
         // chỉ lấy item mà user chưa sở hữu (NOT EXISTS)

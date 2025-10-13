@@ -43,7 +43,8 @@ public class CoursesController : ControllerBase
             Description = request.Description,
             Price = request.Price,
             Coin = request.Coin,
-            ImageUrl = imageUrl
+            ImageUrl = imageUrl,
+            CourseLanguageId = request.CourseLanguageId
         };
 
         var serviceResponse = await _service.CreateCourseAsync(requestDto, cancellationToken);
@@ -74,7 +75,8 @@ public class CoursesController : ControllerBase
             Description = request.Description,
             Price = request.Price,
             Coin = request.Coin,
-            ImageUrl = imageUrl
+            ImageUrl = imageUrl,
+            CourseLanguageId = request.CourseLanguageId
         };
         
         var serviceResponse = await _service.UpdateCourseAsync(id, requestDto, cancellationToken);
