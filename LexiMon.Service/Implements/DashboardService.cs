@@ -2,6 +2,7 @@
 using LexiMon.Repository.Domains;
 using LexiMon.Repository.Enum;
 using LexiMon.Repository.Interfaces;
+using LexiMon.Repository.Utils;
 using LexiMon.Service.ApiResponse;
 using LexiMon.Service.Interfaces;
 using LexiMon.Service.Models.Requests;
@@ -38,39 +39,10 @@ public class DashboardService : IDashboardService
             };
         }
 
-        var orders = await _unitOfWork.GetRepository<Order, Guid>()
-            .Query()
-            .Include(o => o.Course)
-            .Include(o => o.Item).ThenInclude(o => o.Category)
-            .AsNoTracking()
-            .Where(o => o.PurchaseCost != null &&
-                        o.PurchaseCost > 0 &&
-                        o.PaymentStatus == PaymentStatus.Return &&
-                        o.PaidAt >= requestBody.StartDate &&
-                        o.PaidAt <= requestBody.EndDate)
-            .ToListAsync(cancellationToken);
-
-        var totalItemRevenue = orders
-            .Where(o => o.ItemId != null &&
-                        o.Item?.Category?.Name != Categories.PremiumPackage)
-            .Sum(o => o.PurchaseCost ?? 0);
-
-        var totalCourseRevenue = orders
-            .Where(o => o.CourseId != null)
-            .Sum(o => o.PurchaseCost ?? 0);
-
-        var totalPremiumRevenue = orders
-            .Where(o => o.ItemId != null &&
-                        o.Item?.Category?.Name == Categories.PremiumPackage)
-            .Sum(o => o.PurchaseCost ?? 0);
-
-
-        var response = new RevenueResponseDto()
-        {
-            ItemRevenue = totalItemRevenue,
-            CourseRevenue = totalCourseRevenue,
-            PremiumRevenue = totalPremiumRevenue,
-        };
+        var response = await GetRevenueByDate(
+            requestBody.StartDate ?? DateTimeOffset.MinValue,
+            requestBody.EndDate ?? DateTimeOffset.MaxValue,
+            cancellationToken);
 
         return new ResponseData<RevenueResponseDto>()
         {
@@ -225,6 +197,104 @@ public class DashboardService : IDashboardService
         };
     }
 
+    public async Task<ServiceResponse> GetWeeklyRevenueAsync(CancellationToken cancellationToken = default)
+    {
+        var startOfWeek = GetStartOfWeek(TimeConverter.GetCurrentVietNamTime());
+
+        var monday = await GetDailyRevenueAsync(startOfWeek, cancellationToken);
+        var tuesday = await GetDailyRevenueAsync(startOfWeek.AddDays(1), cancellationToken);
+        var wednesday = await GetDailyRevenueAsync(startOfWeek.AddDays(2), cancellationToken);
+        var thursday = await GetDailyRevenueAsync(startOfWeek.AddDays(3), cancellationToken);
+        var friday = await GetDailyRevenueAsync(startOfWeek.AddDays(4), cancellationToken);
+        var saturday = await GetDailyRevenueAsync(startOfWeek.AddDays(5), cancellationToken);
+        var sunday = await GetDailyRevenueAsync(startOfWeek.AddDays(6), cancellationToken);
+
+        var response = new WeeklyRevenueResponseDto()
+        {
+            Monday = monday,
+            Tuesday = tuesday,
+            Wednesday = wednesday,
+            Thursday = thursday,
+            Friday = friday,
+            Saturday = saturday,
+            Sunday = sunday,
+        };
+
+        return new ResponseData<WeeklyRevenueResponseDto>()
+        {
+            Succeeded = true,
+            Message = "Lấy doanh thu tuần thành công!",
+            Data = response,
+        };
+    }
+
+    public async Task<ServiceResponse> GetMonthlyRevenueAsync(CancellationToken cancellationToken = default)
+    {
+        var startOfMonth = GetStartOfMonth(TimeConverter.GetCurrentVietNamTime());
+        var endOfMonth = startOfMonth.AddMonths(1).AddTicks(-1);
+
+        var response = await GetRevenueByDate(startOfMonth, endOfMonth, cancellationToken);
+
+        return new ResponseData<RevenueResponseDto>()
+        {
+            Succeeded = true,
+            Message = "Lấy doanh thu tháng thành công!",
+            Data = response,
+        };
+    }
+
+    public async Task<ServiceResponse> GetYearlyRevenueAsync(CancellationToken cancellationToken = default)
+    {
+        var startOfYear = GetStartOfYear(TimeConverter.GetCurrentVietNamTime());
+        var january = await GetRevenueByDate(
+            startOfYear, startOfYear.AddMonths(1).AddTicks(-1), cancellationToken);
+        var february = await GetRevenueByDate(
+            startOfYear.AddMonths(1), startOfYear.AddMonths(2).AddTicks(-1), cancellationToken);
+        var march = await GetRevenueByDate(
+            startOfYear.AddMonths(2), startOfYear.AddMonths(3).AddTicks(-1), cancellationToken);
+        var april = await GetRevenueByDate(
+            startOfYear.AddMonths(3), startOfYear.AddMonths(4).AddTicks(-1), cancellationToken);
+        var may = await GetRevenueByDate(
+            startOfYear.AddMonths(4), startOfYear.AddMonths(5).AddTicks(-1), cancellationToken);
+        var june = await GetRevenueByDate(
+            startOfYear.AddMonths(5), startOfYear.AddMonths(6).AddTicks(-1), cancellationToken);
+        var july = await GetRevenueByDate(
+            startOfYear.AddMonths(6), startOfYear.AddMonths(7).AddTicks(-1), cancellationToken);
+        var august = await GetRevenueByDate(
+            startOfYear.AddMonths(7), startOfYear.AddMonths(8).AddTicks(-1), cancellationToken);
+        var september = await GetRevenueByDate(
+            startOfYear.AddMonths(8), startOfYear.AddMonths(9).AddTicks(-1), cancellationToken);
+        var october = await GetRevenueByDate(
+            startOfYear.AddMonths(9), startOfYear.AddMonths(10).AddTicks(-1), cancellationToken);
+        var november = await GetRevenueByDate(
+            startOfYear.AddMonths(10), startOfYear.AddMonths(11).AddTicks(-1), cancellationToken);
+        var december = await GetRevenueByDate(
+            startOfYear.AddMonths(11), startOfYear.AddMonths(12).AddTicks(-1), cancellationToken);
+
+        var response = new MonthlyRevenueResponseDto()
+        {
+            January = january,
+            February = february,
+            March = march,
+            April = april,
+            May = may,
+            June = june,
+            July = july,
+            August = august,
+            September = september,
+            October = october,
+            November = november,
+            December = december,
+        };
+
+        return new ResponseData<MonthlyRevenueResponseDto>()
+        {
+            Succeeded = true,
+            Message = "Lấy doanh thu năm thành công!",
+            Data = response,
+        };
+    }
+
 
     #region Method helper
 
@@ -238,7 +308,7 @@ public class DashboardService : IDashboardService
             var count = await _unitOfWork.GetRepository<UserDeck, Guid>()
                 .Query()
                 .AsNoTracking()
-                .Include(d => d.Course).ThenInclude(d => d.CourseLanguage)
+                .Include(d => d.Course).ThenInclude(d => d!.CourseLanguage)
                 .Where(d => d.Status &&
                             d.Course != null &&
                             d.CreatedAt >= requestBody.StartDate &&
@@ -247,6 +317,97 @@ public class DashboardService : IDashboardService
                             d.Course.CourseLanguage.Name == language)
                 .CountAsync(cancellationToken);
             return (int)Math.Round((double)count / totalUsers * 100);
+        }
+
+        private DateTimeOffset GetStartOfWeek(DateTimeOffset currentDate)
+        {
+            var delta = DayOfWeek.Monday - currentDate.DayOfWeek;
+            return currentDate.AddDays(delta).Date;
+        }
+
+        private DateTimeOffset GetStartOfMonth(DateTimeOffset currentDate)
+        {
+            return new DateTimeOffset(currentDate.Year, currentDate.Month, 1, 0, 0, 0, currentDate.Offset);
+        }
+
+        private DateTimeOffset GetStartOfYear(DateTimeOffset currentDate)
+        {
+            return new DateTimeOffset(currentDate.Year, 1, 1, 0, 0, 0, currentDate.Offset);
+        }
+
+        private async Task<RevenueResponseDto> GetDailyRevenueAsync(DateTimeOffset date, CancellationToken cancellationToken = default)
+        {
+            var orders = await _unitOfWork.GetRepository<Order, Guid>()
+                .Query()
+                .Include(o => o.Course)
+                .Include(o => o.Item).ThenInclude(o => o!.Category)
+                .AsNoTracking()
+                .Where(o => o.PurchaseCost != null &&
+                            o.PurchaseCost > 0 &&
+                            o.PaymentStatus == PaymentStatus.Return &&
+                            o.PaidAt >= date &&
+                            o.PaidAt <= date.AddDays(1).AddTicks(-1))
+                .ToListAsync(cancellationToken);
+
+            var totalItemRevenue = orders
+                .Where(o => o.ItemId != null &&
+                            o.Item?.Category?.Name != Categories.PremiumPackage)
+                .Sum(o => o.PurchaseCost ?? 0);
+
+            var totalCourseRevenue = orders
+                .Where(o => o.CourseId != null)
+                .Sum(o => o.PurchaseCost ?? 0);
+
+            var totalPremiumRevenue = orders
+                .Where(o => o.ItemId != null &&
+                            o.Item?.Category?.Name == Categories.PremiumPackage)
+                .Sum(o => o.PurchaseCost ?? 0);
+
+            return new RevenueResponseDto()
+            {
+                ItemRevenue = totalItemRevenue,
+                CourseRevenue = totalCourseRevenue,
+                PremiumRevenue = totalPremiumRevenue,
+            };
+        }
+
+        private async Task<RevenueResponseDto> GetRevenueByDate(
+            DateTimeOffset fromDate,
+            DateTimeOffset toDate,
+            CancellationToken cancellationToken = default)
+        {
+            var orders = await _unitOfWork.GetRepository<Order, Guid>()
+                .Query()
+                .Include(o => o.Course)
+                .Include(o => o.Item).ThenInclude(o => o.Category)
+                .AsNoTracking()
+                .Where(o => o.PurchaseCost != null &&
+                            o.PurchaseCost > 0 &&
+                            o.PaymentStatus == PaymentStatus.Return &&
+                            o.PaidAt >= fromDate &&
+                            o.PaidAt <= toDate.AddDays(1).AddTicks(-1))
+                .ToListAsync(cancellationToken);
+
+            var totalItemRevenue = orders
+                .Where(o => o.ItemId != null &&
+                            o.Item?.Category?.Name != Categories.PremiumPackage)
+                .Sum(o => o.PurchaseCost ?? 0);
+
+            var totalCourseRevenue = orders
+                .Where(o => o.CourseId != null)
+                .Sum(o => o.PurchaseCost ?? 0);
+
+            var totalPremiumRevenue = orders
+                .Where(o => o.ItemId != null &&
+                            o.Item?.Category?.Name == Categories.PremiumPackage)
+                .Sum(o => o.PurchaseCost ?? 0);
+
+            return new RevenueResponseDto()
+            {
+                ItemRevenue = totalItemRevenue,
+                CourseRevenue = totalCourseRevenue,
+                PremiumRevenue = totalPremiumRevenue,
+            };
         }
 
     #endregion
