@@ -346,9 +346,74 @@ public class OrderService : IOrderService
             Data = response
         };
     }
+    
+    public async Task<PaginatedResponse<OrderResponseDto>> GetAllOrders(
+        GetOrderRequest request,
+        CancellationToken cancellationToken)
+    {
+        var repo = _unitOfWork.GetRepository<Order, Guid>();
+        var query = repo.Query();
+            query = query.Include(o => o.Course)
+            .Include(o => o.Item)
+            .Include(o => o.User);
 
+        if (request.MinPrice != null && request.MaxPrice != null)
+        {
+            query = query.Where(o => (o.PurchaseCost >= request.MinPrice && o.PurchaseCost <= request.MaxPrice)
+                                     || (o.CoinCost >= request.MinPrice && o.CoinCost <= request.MaxPrice));
+        }
+        else if (request.MinPrice != null)
+        {
+            query = query.Where(o => o.PurchaseCost >= request.MinPrice || o.CoinCost >= request.MinPrice);
+        }
+        else if (request.MaxPrice != null)
+        {
+            query = query.Where(o => o.PurchaseCost <= request.MaxPrice || o.CoinCost <= request.MaxPrice);
+        }
+        
+        if (request.PaymentStatus.HasValue)
+            query = query.Where(o => o.PaymentStatus == request.PaymentStatus);
 
-
+        if (!string.IsNullOrEmpty(request.Name))
+            query = query.Where(o => (o.Item != null && o.Item.Name.Contains(request.Name))
+                                     || (o.Course != null && o.Course.Title.Contains(request.Name)));
+        if (request.FromDate.HasValue && request.ToDate.HasValue)
+            query = query.Where(o => o.CreatedAt >= request.FromDate && o.CreatedAt <= request.ToDate);
+        else if (request.FromDate.HasValue)
+            query = query.Where(o => o.CreatedAt >= request.FromDate);
+        else if (request.ToDate.HasValue)
+            query = query.Where(o => o.CreatedAt <= request.ToDate);
+        
+        if(!string.IsNullOrEmpty(request.OrderType))
+        {
+            if ("course".Equals(request.OrderType, StringComparison.InvariantCultureIgnoreCase))
+            {
+                query = query.Where(o => o.CourseId != null);
+            }
+            else if ("item".Equals(request.OrderType, StringComparison.InvariantCultureIgnoreCase))
+            {
+                query = query.Where(o => o.ItemId != null);
+            }
+        }
+        
+        var totalCount = query.Count();
+        var response = await query
+            .OrderByDescending(o => o.CreatedAt)
+            .Skip((request.Page - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .Select(o => o.ToOrderResponse())
+            .ToListAsync(cancellationToken);
+        return new PaginatedResponse<OrderResponseDto>
+        {
+            Succeeded = true,
+            Message = "Get orders successfully",
+            TotalCount = totalCount,
+            PageNumber = request.Page,
+            PageSize = request.PageSize,
+            TotalPages = (int)Math.Ceiling((double)totalCount / request.PageSize),
+            Data = response
+};
+    }
     #region Helpers
 
     /// <summary>

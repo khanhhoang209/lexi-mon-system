@@ -17,4 +17,7 @@ public interface IOrderService
         GetOrderUserRequest request,
         string userId, 
         CancellationToken cancellationToken);
+    Task<PaginatedResponse<OrderResponseDto>> GetAllOrders(
+        GetOrderRequest request,
+        CancellationToken cancellationToken);
 }

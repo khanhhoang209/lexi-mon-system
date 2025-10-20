@@ -203,7 +203,7 @@ public class ItemService : IItemService
             query = query.Where(a => a.Status == request.IsActive.Value);
         var totalCount = query.Count();
         
-        var coursesResponse = await query
+        var itemsResponse = await query
             .OrderByDescending(c => c.Status)
             .ThenByDescending(c => c.CreatedAt)
             .Skip((request.Page - 1) * request.PageSize)
@@ -215,12 +215,12 @@ public class ItemService : IItemService
         return new PaginatedResponse<ItemResponseDto>()
         {
             Succeeded = true,
-            Message = "Courses retrieved successfully",
+            Message = "Item retrieved successfully",
             TotalCount = totalCount,
             PageNumber = request.Page,
             PageSize = request.PageSize,
             TotalPages = (int)Math.Ceiling((double)totalCount / request.PageSize),
-            Data = coursesResponse
+            Data = itemsResponse
         };
     }
     public async Task<PaginatedResponse<ItemResponseDto>> GetShopItemsAsync(
