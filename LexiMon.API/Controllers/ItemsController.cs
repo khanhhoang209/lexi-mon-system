@@ -20,7 +20,7 @@ public class ItemsController : ControllerBase
         _blob = blob;
         _defaultContainer = configuration["Azure:BlobStorageSettings:DefaultContainer"] ?? "images";
     }
-    
+
       [HttpPost]
     [Consumes("multipart/form-data")]
     [RequestSizeLimit(10_000_000)]
@@ -43,8 +43,9 @@ public class ItemsController : ControllerBase
             Coin = requestForm.Coin,
             Price = requestForm.Price,
             CategoryId = requestForm.CategoryId,
+            IsPremium = requestForm.IsPremium
         };
-        
+
         var serviceResponse = await _service.CreateItemAsync(request, cancellationToken);
         if (serviceResponse.Succeeded)
         {
@@ -75,8 +76,9 @@ public class ItemsController : ControllerBase
             Coin = requestForm.Coin,
             Price = requestForm.Price,
             CategoryId = requestForm.CategoryId,
+            IsPremium = requestForm.IsPremium
         };
-        
+
         var serviceResponse = await _service.UpdateItemAsync(id, request, cancellationToken);
         if (serviceResponse.Succeeded)
         {
@@ -85,10 +87,10 @@ public class ItemsController : ControllerBase
 
         return TypedResults.BadRequest(serviceResponse);
     }
-    
+
     [HttpDelete("{id:guid}")]
     public async Task<IResult> DeleteAsync(
-        [FromRoute] Guid id, 
+        [FromRoute] Guid id,
         CancellationToken cancellationToken = default)
     {
         var serviceResponse = await _service.DeleteItemAsync(id, cancellationToken);
@@ -99,7 +101,7 @@ public class ItemsController : ControllerBase
 
         return TypedResults.NotFound(serviceResponse);
     }
-    
+
     [HttpGet("{id:guid}")]
     public async Task<IResult> GetByIdAsync(
         [FromRoute] Guid id,
@@ -115,23 +117,23 @@ public class ItemsController : ControllerBase
 
     [HttpGet]
     public async Task<IResult> GetAllAsync(
-        [FromQuery] GetItemRequest request, 
+        [FromQuery] GetItemRequest request,
         CancellationToken cancellationToken = default)
     {
         var serviceResponse = await _service.GetItemsAsync(request, cancellationToken);
         return Results.Ok(serviceResponse);
-        
+
     }
     [HttpGet("shop")]
     [Authorize]
     public async Task<IResult> GetShopItemsAsync(
-        [FromQuery] GetItemRequest request, 
+        [FromQuery] GetItemRequest request,
         CancellationToken cancellationToken = default)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
                      ?? throw new Exception("User not found");
         var serviceResponse = await _service.GetShopItemsAsync(userId, request, cancellationToken);
         return Results.Ok(serviceResponse);
-        
+
     }
 }

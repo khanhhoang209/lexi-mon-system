@@ -23,4 +23,10 @@ public interface IDashboardService
         PopularLanguageRequestDto requestBody,
         CancellationToken cancellationToken = default);
 
+    Task<ServiceResponse> GetWeeklyRevenueAsync(CancellationToken cancellationToken = default);
+
+    Task<ServiceResponse> GetMonthlyRevenueAsync(CancellationToken cancellationToken = default);
+
+    Task<ServiceResponse> GetYearlyRevenueAsync(CancellationToken cancellationToken = default);
+
 }
