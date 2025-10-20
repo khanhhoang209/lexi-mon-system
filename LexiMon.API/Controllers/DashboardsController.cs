@@ -75,6 +75,7 @@ public class DashboardsController : ControllerBase
         {
             return TypedResults.Ok(serviceResponse);
         }
+
         return TypedResults.Unauthorized();
     }
 
@@ -104,4 +105,41 @@ public class DashboardsController : ControllerBase
 
         return TypedResults.Unauthorized();
     }
+
+    [HttpGet("weekly-revenue")]
+    public async Task<IResult> GetWeeklyRevenueAsync(CancellationToken cancellationToken = default)
+    {
+        var serviceResponse = await _dashboardService.GetWeeklyRevenueAsync(cancellationToken);
+        if (serviceResponse.Succeeded)
+        {
+            return TypedResults.Ok(serviceResponse);
+        }
+
+        return TypedResults.Unauthorized();
+    }
+
+    [HttpGet("monthly-revenue")]
+    public async Task<IResult> GetMonthlyRevenueAsync(CancellationToken cancellationToken = default)
+    {
+        var serviceResponse = await _dashboardService.GetMonthlyRevenueAsync(cancellationToken);
+        if (serviceResponse.Succeeded)
+        {
+            return TypedResults.Ok(serviceResponse);
+        }
+
+        return TypedResults.Unauthorized();
+    }
+
+    [HttpGet("yearly-revenue")]
+    public async Task<IResult> GetYearlyRevenueAsync(CancellationToken cancellationToken = default)
+    {
+        var serviceResponse = await _dashboardService.GetYearlyRevenueAsync(cancellationToken);
+        if (serviceResponse.Succeeded)
+        {
+            return TypedResults.Ok(serviceResponse);
+        }
+
+        return TypedResults.Unauthorized();
+    }
+
 }
