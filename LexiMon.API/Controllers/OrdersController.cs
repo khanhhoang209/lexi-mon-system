@@ -43,4 +43,15 @@ public class OrdersController : ControllerBase
          
          return TypedResults.Ok(response);
      }
+
+    [HttpGet]
+    public async Task<IResult> GetAllOrders(
+        [FromQuery] GetOrderRequest request,
+        CancellationToken cancellationToken)
+    {
+        var response = await _service.GetAllOrders(request, cancellationToken);
+        if (!response.Succeeded)
+            return TypedResults.BadRequest(response);
+        return TypedResults.Ok(response);
+    }
 }

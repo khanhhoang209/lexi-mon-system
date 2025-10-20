@@ -38,4 +38,22 @@ public static class OrderMapper
             UpdatedAt = order.UpdatedAt
         };
     }
+    public static OrderResponseDto ToOrderResponse(this Order order)
+    {
+        return new OrderResponseDto
+        {
+            Id = order.Id,
+            CourseId = order.CourseId,
+            ItemId = order.ItemId,
+            PurchaseCost = order.PurchaseCost,
+            CoinCost = order.CoinCost,
+            PaidAt = order.PaidAt,
+            PaymentStatus = order.PaymentStatus,
+            ItemName = order.Item?.Name,
+            CourseTitle = order.Course?.Title,
+            CreatedAt = order.CreatedAt,
+            UpdatedAt = order.UpdatedAt,
+            Email = order.User!.Email,
+        };
+    }
 }
