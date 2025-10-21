@@ -14,4 +14,5 @@ public class GetItemRequest
     public decimal? MinPrice { get; init; } 
     public decimal? MaxPrice { get; init; } 
     public bool? IsActive { get; init; }
+    public bool? IsPremium { get; init; }
 }

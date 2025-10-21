@@ -201,6 +201,9 @@ public class ItemService : IItemService
         }
         if(request.IsActive.HasValue)
             query = query.Where(a => a.Status == request.IsActive.Value);
+        if(request.IsPremium.HasValue)
+            query = query.Where(p => p.IsPremium == request.IsPremium.Value);
+        
         var totalCount = query.Count();
         
         var itemsResponse = await query

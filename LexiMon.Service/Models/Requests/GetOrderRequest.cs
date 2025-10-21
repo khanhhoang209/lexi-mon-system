@@ -16,4 +16,5 @@ public class GetOrderRequest
     public DateTimeOffset? FromDate { get; set; }
     public DateTimeOffset? ToDate { get; set; }
     public string? OrderType { get; init; }
+    public string? Email { get; init; }
 }
