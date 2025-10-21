@@ -13,7 +13,7 @@ public class OrderResponseDto
     public PaymentStatus PaymentStatus { get; set; }
     public string? ItemName { get; set; }
     public string? CourseTitle { get; set; }
-    public string Email { get; set; } = null!;
+    public string? Email { get; set; } = null!;
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? UpdatedAt { get; set; }
 }
