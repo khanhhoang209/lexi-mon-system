@@ -395,10 +395,7 @@ public class OrderService : IOrderService
                 query = query.Where(o => o.ItemId != null);
             }
         }
-        if(!string.IsNullOrEmpty(request.Email))
-        {
-            query = query.Where(o =>o.User!.Email.Contains(request.Email));
-        }
+        
         var totalCount = query.Count();
         var response = await query
             .OrderByDescending(o => o.CreatedAt)

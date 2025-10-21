@@ -53,7 +53,7 @@ public static class OrderMapper
             CourseTitle = order.Course?.Title,
             CreatedAt = order.CreatedAt,
             UpdatedAt = order.UpdatedAt,
-            Email = order.User.Email,
+            Email = order.User!.Email,
         };
     }
 }
