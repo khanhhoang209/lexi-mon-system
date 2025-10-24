@@ -193,8 +193,20 @@ public class LexiMonDbContext : IdentityDbContext<ApplicationUser>, ILexiMonDbCo
                 Id = Guid.Parse("083e0832-47a5-449a-9c60-5f61db49140d"),
                 CategoryId = Guid.Parse("a6368fa8-5017-4de2-a15c-719546923a1d"),
                 Name = "Premium Package",
-                Description = "A package that unlocks all premium features and content.",
+                Description = "Unlock the full Leximon experience with the Premium Package. Enjoy exclusive features, unlimited access to all content, faster progression, and special rewards that enhance both gameplay and customization. Designed for dedicated users who want the ultimate experience.",
                 Price = 49000,
+                ImageUrl = "https://leximon.blob.core.windows.net/images/premium-package.png",
+                IsPremium = false,
+                Status = true,
+            },
+            new Item()
+            {
+                Id = Guid.Parse("96423DE3-75E5-4337-B3D0-83F1FBDB90A5"),
+                CategoryId = Guid.Parse("a6368fa8-5017-4de2-a15c-719546923a1d"),
+                Name = "Starter Package",
+                Description = "Get started with the basic features of Leximon. The Starter Package lets you explore essential tools, play freely, and experience the system without any cost. Perfect for new users who want to learn and progress step by step before unlocking premium advantages.",
+                ImageUrl = "https://leximon.blob.core.windows.net/images/starter-package.png",
+                Price = 0,
                 IsPremium = false,
                 Status = true,
             }
