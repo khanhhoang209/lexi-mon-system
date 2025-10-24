@@ -53,6 +53,19 @@ public class PaymentService : IPaymentService
                 };
             }
 
+            if(order.CreatedAt < DateTimeOffset.UtcNow.AddMinutes(-20))
+            {
+                _logger.LogError("Order expired with OrderId: {OrderId}", requestBody.OrderId);
+                order.PaymentStatus = PaymentStatus.Fail;
+                await _unitOfWork.GetRepository<Order, Guid>().UpdateAsync(order, cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                return new ServiceResponse()
+                {
+                    Succeeded = false,
+                    Message = "Đơn hàng đã hết hạn! Vui lòng mua đơn hàng mới."
+                };
+            }
+            
             if (order.PaymentStatus != PaymentStatus.Pending)
             {
                 _logger.LogError("Order status is not valid with OrderId: {OrderId}", requestBody.OrderId);
