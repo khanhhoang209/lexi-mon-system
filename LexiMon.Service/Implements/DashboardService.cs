@@ -200,7 +200,7 @@ public class DashboardService : IDashboardService
     public async Task<ServiceResponse> GetWeeklyRevenueAsync(CancellationToken cancellationToken = default)
     {
         var startOfWeek = GetStartOfWeek(TimeConverter.GetCurrentVietNamTime());
-
+        _logger.LogInformation("Start of week: {StartOfWeek}", startOfWeek);
         var monday = await GetDailyRevenueAsync(startOfWeek, cancellationToken);
         var tuesday = await GetDailyRevenueAsync(startOfWeek.AddDays(1), cancellationToken);
         var wednesday = await GetDailyRevenueAsync(startOfWeek.AddDays(2), cancellationToken);
@@ -231,6 +231,8 @@ public class DashboardService : IDashboardService
     public async Task<ServiceResponse> GetMonthlyRevenueAsync(CancellationToken cancellationToken = default)
     {
         var startOfMonth = GetStartOfMonth(TimeConverter.GetCurrentVietNamTime());
+        _logger.LogInformation("Start of week: {StartOfMonth}", startOfMonth);
+
         var endOfMonth = startOfMonth.AddMonths(1).AddTicks(-1);
 
         var response = await GetRevenueByDate(startOfMonth, endOfMonth, cancellationToken);
@@ -246,6 +248,7 @@ public class DashboardService : IDashboardService
     public async Task<ServiceResponse> GetYearlyRevenueAsync(CancellationToken cancellationToken = default)
     {
         var startOfYear = GetStartOfYear(TimeConverter.GetCurrentVietNamTime());
+        _logger.LogInformation("Start of week: {StartOfYear}", startOfYear);
         var january = await GetRevenueByDate(
             startOfYear, startOfYear.AddMonths(1).AddTicks(-1), cancellationToken);
         var february = await GetRevenueByDate(
@@ -319,18 +322,22 @@ public class DashboardService : IDashboardService
             return (int)Math.Round((double)count / totalUsers * 100);
         }
 
-        private DateTimeOffset GetStartOfWeek(DateTimeOffset currentDate)
+        private static DateTimeOffset GetStartOfWeek(DateTimeOffset currentDate)
         {
+            if (currentDate.DayOfWeek == DayOfWeek.Sunday)
+            {
+                return currentDate.AddDays(-6).Date;
+            }
             var delta = DayOfWeek.Monday - currentDate.DayOfWeek;
             return currentDate.AddDays(delta).Date;
         }
 
-        private DateTimeOffset GetStartOfMonth(DateTimeOffset currentDate)
+        private static DateTimeOffset GetStartOfMonth(DateTimeOffset currentDate)
         {
             return new DateTimeOffset(currentDate.Year, currentDate.Month, 1, 0, 0, 0, currentDate.Offset);
         }
 
-        private DateTimeOffset GetStartOfYear(DateTimeOffset currentDate)
+        private static DateTimeOffset GetStartOfYear(DateTimeOffset currentDate)
         {
             return new DateTimeOffset(currentDate.Year, 1, 1, 0, 0, 0, currentDate.Offset);
         }
